@@ -12,30 +12,27 @@
 
         gtag('config', 'G-420KNS52DK');
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/rss-parser@3.13.0/dist/rss-parser.min.js"></script>
     <script>
-        const init = async () => {
-            try {
-                const eipsodedWrapper = document.getElementById("episodes");
+        const init = () => {
+            fetch('https://anchor.fm/s/db286500/podcast/rss')
+                .then(res => res.text())
+                .then(data => {
+                    const eipsodedWrapper = document.getElementById("episodes");
 
-                const parser = new RSSParser();
-                parser.parseURL('https://anchor.fm/s/db286500/podcast/rss', (err, feed) => {
-                    if (err) throw err;
-                    console.log(feed)
+                    const parser = new window.DOMParser();
+                    const feed = parser.parseFromString(data, "text/xml");
+                    const items = feed.getElementsByTagName("item");
 
-                    feed.items.forEach(item => {
+                    for (item of items) {
                         const a = document.createElement("a");
-                        a.href = item.link;
-                        a.innerText = item.title;
+                        a.href = item.getElementsByTagName("link")[0].textContent;
+                        a.innerText = item.getElementsByTagName("title")[0].textContent;
                         a.target = "_blank";
                         const li = document.createElement("li");
                         li.appendChild(a);
                         eipsodedWrapper.appendChild(li);
-                    });
+                    }
                 });
-            } catch(e) {
-                console.log(e);
-            }
         }
 
         window.addEventListener("DOMContentLoaded", init);
