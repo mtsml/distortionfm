@@ -12,14 +12,25 @@
 
         gtag('config', 'G-420KNS52DK');
     </script>
+    <script>
+        const episodeIds = ["24-e25lgvk", "23-e25cl6k", "22-Z-e25bbcf", "21-e24vuh5", "20-19-e24k1sq"];
+        const init = () => {
+            const eipsodedWrapper = document.getElementById("episodes");
+            episodeIds.forEach(episodeId => {
+                const episode = document.createElement("iframe");
+                episode.setAttribute("src", `https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/${episodeId}`);
+                episode.setAttribute("height", "102px");
+                episode.setAttribute("width", "400px");
+                episode.setAttribute("frameborder", "0");
+                episode.setAttribute("scrolling", "no");
+                eipsodedWrapper.appendChild(episode);
+            });
+        }
+    </script>
 </head>
-<body>
+<body onload="init()">
     <h1>Episodes</h1>
-    <iframe src="https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/24-e25lgvk" height="102px" width="400px" frameborder="0" scrolling="no"></iframe>
-    <iframe src="https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/23-e25cl6k" height="102px" width="400px" frameborder="0" scrolling="no"></iframe>
-    <iframe src="https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/22-Z-e25bbcf" height="102px" width="400px" frameborder="0" scrolling="no"></iframe>
-    <iframe src="https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/21-e24vuh5" height="102px" width="400px" frameborder="0" scrolling="no"></iframe>
-    <iframe src="https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/20-19-e24k1sq" height="102px" width="400px" frameborder="0" scrolling="no"></iframe>
+    <div id="episodes"></div>
     <p>and more...</p>
 
     <h1>Subscribe</h1>
