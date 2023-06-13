@@ -13,12 +13,13 @@
         gtag('config', 'G-420KNS52DK');
     </script>
     <script>
-        const init = () => {
+        window.addEventListener("DOMContentLoaded", () => {
             fetch('https://anchor.fm/s/db286500/podcast/rss')
                 .then(res => res.text())
                 .then(data => {
                     const eipsodedWrapper = document.getElementById("episodes");
 
+                    // RSSフィードをパースしてエピソード（item）を取得する
                     const parser = new window.DOMParser();
                     const feed = parser.parseFromString(data, "text/xml");
                     const items = feed.getElementsByTagName("item");
@@ -33,14 +34,10 @@
                         eipsodedWrapper.appendChild(li);
                     }
                 });
-        }
-
-        window.addEventListener("DOMContentLoaded", init);
-
+        });
     </script>
 </head>
 <body>
-    <button onclick="init()">reflesh</button>
     <h1>Episodes</h1>
     <ul id="episodes"></ul>
 
