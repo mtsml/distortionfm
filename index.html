@@ -12,13 +12,19 @@
 
         gtag('config', 'G-420KNS52DK');
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/rss-parser@3.13.0/dist/rss-parser.min.js"></script>
     <script>
-        const episodeIds = ["24-e25lgvk", "23-e25cl6k", "22-Z-e25bbcf", "21-e24vuh5", "20-19-e24k1sq"];
-        const init = () => {
+        const init = async () => {
             const eipsodedWrapper = document.getElementById("episodes");
-            episodeIds.forEach(episodeId => {
+
+            const parser = new RSSParser();
+            const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
+
+            feed.items.forEach(item => {
+                const embedUrl = item.link.replace("episodes", "embed/episodes")
+
                 const episode = document.createElement("iframe");
-                episode.setAttribute("src", `https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/${episodeId}`);
+                episode.setAttribute("src", embedUrl);
                 episode.setAttribute("height", "102px");
                 episode.setAttribute("width", "400px");
                 episode.setAttribute("frameborder", "0");
@@ -31,7 +37,6 @@
 <body onload="init()">
     <h1>Episodes</h1>
     <div id="episodes"></div>
-    <p>and more...</p>
 
     <h1>Subscribe</h1>
     <ul>
