@@ -14,24 +14,32 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/rss-parser@3.13.0/dist/rss-parser.min.js"></script>
     <script>
-        window.addEventListener("DOMContentLoaded", async () => {
-            console.log("DOMContentLoaded")
-            const eipsodedWrapper = document.getElementById("episodes");
+        try {
+            window.addEventListener("DOMContentLoaded", async () => {
+                console.log("DOMContentLoaded")
+                const eipsodedWrapper = document.getElementById("episodes");
 
-            const parser = new RSSParser();
-            const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
+                console.log("create RSSParser Instance");
+                const parser = new RSSParser();
+                console.log("await feed")
+                const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
-            feed.items.forEach(item => {
-                console.log(item)
-                const a = document.createElement("a");
-                a.href = item.link;
-                a.innerText = item.title;
-                a.target = "_blank";
-                const li = document.createElement("li");
-                li.appendChild(a);
-                eipsodedWrapper.appendChild(li);
+                console.log("feed")
+                console.log(feed)
+                feed.items.forEach(item => {
+                    console.log(item)
+                    const a = document.createElement("a");
+                    a.href = item.link;
+                    a.innerText = item.title;
+                    a.target = "_blank";
+                    const li = document.createElement("li");
+                    li.appendChild(a);
+                    eipsodedWrapper.appendChild(li);
+                });
             });
-        });
+        } catch(e) {
+            console.log(e)
+        }
     </script>
 </head>
 <body>
