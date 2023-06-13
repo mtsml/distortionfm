@@ -16,27 +16,22 @@
     <script>
         const init = async () => {
             try {
-                console.log("DOMContentLoaded")
-
                 const eipsodedWrapper = document.getElementById("episodes");
 
-                console.log("create RSSParser Instance");
                 const parser = new RSSParser();
-                console.log("await feed")
-                const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
+                parser.parseURL('https://anchor.fm/s/db286500/podcast/rss', (err, feed) => {
+                    if (err) throw err;
+                    console.log(feed)
 
-                console.log("feed")
-                console.log(feed)
-
-                feed.items.forEach(item => {
-                    console.log(item)
-                    const a = document.createElement("a");
-                    a.href = item.link;
-                    a.innerText = item.title;
-                    a.target = "_blank";
-                    const li = document.createElement("li");
-                    li.appendChild(a);
-                    eipsodedWrapper.appendChild(li);
+                    feed.items.forEach(item => {
+                        const a = document.createElement("a");
+                        a.href = item.link;
+                        a.innerText = item.title;
+                        a.target = "_blank";
+                        const li = document.createElement("li");
+                        li.appendChild(a);
+                        eipsodedWrapper.appendChild(li);
+                    });
                 });
             } catch(e) {
                 console.log(e);
