@@ -21,22 +21,20 @@
             const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
             feed.items.forEach(item => {
-                const embedUrl = item.link.replace("episodes", "embed/episodes")
-
-                const episode = document.createElement("iframe");
-                episode.setAttribute("src", embedUrl);
-                episode.setAttribute("height", "102px");
-                episode.setAttribute("width", "400px");
-                episode.setAttribute("frameborder", "0");
-                episode.setAttribute("scrolling", "no");
-                eipsodedWrapper.appendChild(episode);
+                const a = document.createElement("a");
+                a.href = item.link;
+                a.innerText = item.title;
+                a.target = "_blank";
+                const li = document.createElement("li");
+                li.appendChild(a);
+                eipsodedWrapper.appendChild(li);
             });
         }
     </script>
 </head>
 <body onload="init()">
     <h1>Episodes</h1>
-    <div id="episodes"></div>
+    <ul id="episodes"></ul>
 
     <h1>Subscribe</h1>
     <ul>
