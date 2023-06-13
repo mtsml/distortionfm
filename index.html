@@ -14,8 +14,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/rss-parser@3.13.0/dist/rss-parser.min.js"></script>
     <script>
-        try {
-            window.addEventListener("DOMContentLoaded", async () => {
+        const init = async () => {
+            try {
                 console.log("DOMContentLoaded")
                 const eipsodedWrapper = document.getElementById("episodes");
 
@@ -40,14 +40,18 @@
 
                 const res = await fetch('https://anchor.fm/s/db286500/podcast/rss');
                 console.log(res)
-                console.log(res.type)
-            });
-        } catch(e) {
-            console.log(e)
+                console.log(res.type)    
+            } catch(e) {
+                console.log(e);
+            }
         }
+
+        window.addEventListener("DOMContentLoaded", init);
+
     </script>
 </head>
 <body>
+    <button onclick="init()">reflesh</button>
     <h1>Episodes</h1>
     <ul id="episodes"></ul>
 
