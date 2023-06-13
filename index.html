@@ -14,7 +14,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/rss-parser@3.13.0/dist/rss-parser.min.js"></script>
     <script>
-        const init = async () => {
+        window.addEventListener("DOMContentLoaded", async () => {
             const eipsodedWrapper = document.getElementById("episodes");
 
             const parser = new RSSParser();
@@ -29,10 +29,10 @@
                 li.appendChild(a);
                 eipsodedWrapper.appendChild(li);
             });
-        }
+        });
     </script>
 </head>
-<body onload="init()">
+<body>
     <h1>Episodes</h1>
     <ul id="episodes"></ul>
 
