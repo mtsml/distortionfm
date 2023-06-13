@@ -26,6 +26,7 @@
 
                 console.log("feed")
                 console.log(feed)
+
                 feed.items.forEach(item => {
                     console.log(item)
                     const a = document.createElement("a");
@@ -36,6 +37,10 @@
                     li.appendChild(a);
                     eipsodedWrapper.appendChild(li);
                 });
+
+                const res = await fetch('https://anchor.fm/s/db286500/podcast/rss');
+                console.log(res)
+                console.log(res.type)
             });
         } catch(e) {
             console.log(e)
