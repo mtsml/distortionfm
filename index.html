@@ -17,6 +17,12 @@
         const init = async () => {
             try {
                 console.log("DOMContentLoaded")
+
+                const res = await fetch('https://anchor.fm/s/db286500/podcast/rss');
+                console.log(res)
+                console.log(res.type)
+
+
                 const eipsodedWrapper = document.getElementById("episodes");
 
                 console.log("create RSSParser Instance");
@@ -37,10 +43,6 @@
                     li.appendChild(a);
                     eipsodedWrapper.appendChild(li);
                 });
-
-                const res = await fetch('https://anchor.fm/s/db286500/podcast/rss');
-                console.log(res)
-                console.log(res.type)    
             } catch(e) {
                 console.log(e);
             }
