@@ -37,12 +37,12 @@
                         }
                     }
 
-                    console.log(episode)
-
                     // title
                     const title = document.createElement("h1");
                     title.innerText = episode.getElementsByTagName("title")[0].textContent;
                     body.appendChild(title);
+                    const headTitle = document.getElementsByTagName("title")[0];
+                    headTitle.innerText = episode.getElementsByTagName("title")[0].textContent;
 
                     // プレイヤー
                     const iframe = document.createElement("iframe");
