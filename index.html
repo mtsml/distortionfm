@@ -25,10 +25,12 @@
                     const items = feed.getElementsByTagName("item");
 
                     for (item of items) {
+                        const episodeUrl = item.getElementsByTagName("link")[0].textContent;
+                        const epidodeId = episodeUrl.match(/episodes.*/g)[0].replace("episodes/", "");
+
                         const a = document.createElement("a");
-                        a.href = item.getElementsByTagName("link")[0].textContent;
+                        a.href = "./episode.html?id=" + epidodeId;
                         a.innerText = item.getElementsByTagName("title")[0].textContent;
-                        a.target = "_blank";
                         const li = document.createElement("li");
                         li.appendChild(a);
                         eipsodedWrapper.appendChild(li);

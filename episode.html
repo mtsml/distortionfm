@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Distortion.fm</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-420KNS52DK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-420KNS52DK');
+    </script>
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const body = document.getElementsByTagName("body")[0];
+
+            const searchParams = new URLSearchParams(window.location.search);
+            const episodeId = searchParams.get("id");
+
+            // エピソード情報を取得
+            fetch('https://anchor.fm/s/db286500/podcast/rss')
+                .then(res => res.text())
+                .then(data => {
+                    // RSSフィードをパースしてエピソード（item）を取得する
+                    const parser = new window.DOMParser();
+                    const feed = parser.parseFromString(data, "text/xml");
+                    const items = feed.getElementsByTagName("item");
+
+                    let episode;
+                    for (item of items) {
+                        const episodeUrl = item.getElementsByTagName("link")[0].textContent;
+                        if (episodeUrl.includes(episodeId)) {
+                            episode = item;
+                            break;
+                        }
+                    }
+
+                    console.log(episode)
+
+                    // title
+                    const title = document.createElement("h1");
+                    title.innerText = episode.getElementsByTagName("title")[0].textContent;
+                    body.appendChild(title);
+
+                    // プレイヤー
+                    const iframe = document.createElement("iframe");
+                    iframe.setAttribute("src", `https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/${episodeId}`);
+                    iframe.setAttribute("height", "102px");
+                    iframe.setAttribute("width", "400px");
+                    iframe.setAttribute("frameborder", "0");
+                    iframe.setAttribute("scrolling", "no");
+                    body.appendChild(iframe);
+
+                    // description
+                    const description = document.createElement("p");
+                    description.innerText = episode.getElementsByTagName("description")[0].textContent;
+                    body.appendChild(description);
+                    
+                    // pubDate
+                    const pubDate = document.createElement("p");
+                    pubDate.innerText = episode.getElementsByTagName("pubDate")[0].textContent;
+                    body.appendChild(pubDate);
+                });
+        });
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
