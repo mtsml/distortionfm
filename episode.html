@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Distortion.fm</title>
     <link rel="icon" href="favicon.png" />
     <!-- Google tag (gtag.js) -->
@@ -55,10 +56,12 @@
                     body.appendChild(iframe);
 
                     // description
-                    const description = document.createElement("p");
-                    description.innerText = episode.getElementsByTagName("description")[0].textContent;
-                    body.appendChild(description);
-                    
+                    const parsedDescription = parser.parseFromString(episode.getElementsByTagName("description")[0].textContent, "text/html");
+                    const description = Array.from(parsedDescription.body.childNodes);
+                    // descriptionの要素が<p>で始まらないことがあるので、先頭に空の<p>を挿入
+                    body.appendChild(document.createElement("p"));
+                    description.forEach(d => body.appendChild(d));
+
                     // pubDate
                     const pubDate = document.createElement("p");
                     pubDate.innerText = episode.getElementsByTagName("pubDate")[0].textContent;
@@ -66,8 +69,23 @@
                 });
         });
     </script>
+    <style>
+        body {
+            width: 100%;
+            white-space: normal;
+        }
+
+        h1 {
+            width: 100%;
+            border-bottom: solid 1px #000000;
+        }
+
+        p {
+            font-family: Georgia, "Cambria", serif;
+            line-height: 1.8em;
+        }
+    </style>
 </head>
 <body>
-    
 </body>
 </html>
