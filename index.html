@@ -36,9 +36,9 @@
                         const a = document.createElement("a");
                         a.href = "./episode.html?id=" + epidodeId;
                         a.innerText = item.getElementsByTagName("title")[0].textContent;
-                        a.setAttribute("class", "pure-menu-link");
+                        a.classList.add("pure-menu-link");
                         const div = document.createElement("div");
-                        div.setAttribute("class", "pure-menu-item");
+                        div.classList.add("pure-menu-item");
                         div.appendChild(a);
                         eipsodedWrapper.appendChild(div);
                     }
