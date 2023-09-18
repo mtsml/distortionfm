@@ -58,8 +58,6 @@
                     // description
                     const parsedDescription = parser.parseFromString(episode.getElementsByTagName("description")[0].textContent, "text/html");
                     const description = Array.from(parsedDescription.body.childNodes);
-                    // descriptionの要素が<p>で始まらないことがあるので、先頭に空の<p>を挿入
-                    body.appendChild(document.createElement("p"));
                     description.forEach(d => body.appendChild(d));
 
                     // pubDate
