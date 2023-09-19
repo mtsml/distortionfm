@@ -5,6 +5,11 @@
     overflow-wrap: anywhere;
 }
 
+body {
+    width: 100%;
+    white-space: normal;
+}
+
 header {
     background-color: rgb(61, 79, 93);
     color: #fff;
@@ -53,4 +58,9 @@ li {
 li .pure-menu-link {
     padding-left: 0;
     padding-right: 0;
+}
+
+p {
+    font-family: Georgia, "Cambria", serif;
+    line-height: 1.8em;
 }

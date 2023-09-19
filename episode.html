@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Distortion.fm</title>
     <link rel="icon" href="favicon.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
+        integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/grids-responsive-min.css" />
+    <link rel="stylesheet" href="styles.css"/>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-420KNS52DK"></script>
     <script>
@@ -16,7 +20,7 @@
     </script>
     <script>
         window.addEventListener("DOMContentLoaded", () => {
-            const body = document.getElementsByTagName("body")[0];
+            const main = document.getElementsByTagName("main")[0];
 
             const searchParams = new URLSearchParams(window.location.search);
             const episodeId = searchParams.get("id");
@@ -42,7 +46,7 @@
                     // title
                     const title = document.createElement("h1");
                     title.innerText = episode.getElementsByTagName("title")[0].textContent;
-                    body.appendChild(title);
+                    main.appendChild(title);
                     const headTitle = document.getElementsByTagName("title")[0];
                     headTitle.innerText = episode.getElementsByTagName("title")[0].textContent;
 
@@ -53,37 +57,26 @@
                     iframe.setAttribute("width", "400px");
                     iframe.setAttribute("frameborder", "0");
                     iframe.setAttribute("scrolling", "no");
-                    body.appendChild(iframe);
+                    main.appendChild(iframe);
 
                     // description
                     const parsedDescription = parser.parseFromString(episode.getElementsByTagName("description")[0].textContent, "text/html");
                     const description = Array.from(parsedDescription.body.childNodes);
-                    description.forEach(d => body.appendChild(d));
+                    description.forEach(d => main.appendChild(d));
 
                     // pubDate
                     const pubDate = document.createElement("p");
                     pubDate.innerText = episode.getElementsByTagName("pubDate")[0].textContent;
-                    body.appendChild(pubDate);
+                    main.appendChild(pubDate);
                 });
         });
     </script>
-    <style>
-        body {
-            width: 100%;
-            white-space: normal;
-        }
-
-        h1 {
-            width: 100%;
-            border-bottom: solid 1px #000000;
-        }
-
-        p {
-            font-family: Georgia, "Cambria", serif;
-            line-height: 1.8em;
-        }
-    </style>
 </head>
-<body>
+<body class="pure-g">
+    <header class="pure-u-1 pure-u-xl-1-4">
+        <a href="./index.html">Distortion.fm</a>
+        <p>1995年生まれの男性が友達と雑談をする。</p>
+    </header>
+    <main class="pure-u-1 pure-u-xl-3-4"></main>
 </body>
 </html>
