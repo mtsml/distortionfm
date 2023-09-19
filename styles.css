@@ -1,0 +1,56 @@
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+}
+
+header {
+    background-color: rgb(61, 79, 93);
+    color: #fff;
+    font-weight: bold;
+    display: inline;
+    padding: 1% 1%;
+}
+
+a:hover,
+a:focus {
+    text-decoration: underline;
+}
+
+header a {
+    font-size: 250%;
+    text-decoration: none;
+    color: rgb(61, 146, 201);
+}
+
+h1 {
+    border-bottom: 1px solid #eee;
+    padding: 0.4em 0.2em;
+}
+
+main {
+    padding: 1em;
+}
+
+.pure-menu-link {
+    white-space: normal;
+}
+
+ul {
+    list-style-type: none;
+    margin-block-start: 0em;
+    margin-block-end: 0em;
+    padding-inline-start: 0px;
+    padding-left: 1em;
+}
+
+li {
+    width: fit-content;
+    list-style: none;
+}
+
+li .pure-menu-link {
+    padding-left: 0;
+    padding-right: 0;
+}
