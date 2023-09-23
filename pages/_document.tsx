@@ -6,6 +6,7 @@ const Document = () => {
       <Head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="1995年生まれの男性が友達と雑談をする" />
         <title>Distortion.fm</title>
         <link rel="icon" href="favicon.png" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css"
