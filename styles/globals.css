@@ -15,7 +15,7 @@ header {
     color: #fff;
     font-weight: bold;
     display: inline;
-    padding: 1% 1%;
+    padding: 1em 1em 0 1em;
 }
 
 a:hover,
@@ -32,6 +32,7 @@ header a {
 h1 {
     border-bottom: 1px solid #eee;
     padding: 0.4em 0.2em;
+    margin-top: 0;
 }
 
 .contents {
