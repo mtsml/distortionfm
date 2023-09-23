@@ -95,3 +95,5 @@ export const getStaticProps: GetStaticProps = async (context) => {
     }
   }
 }
+
+export default Episode;
