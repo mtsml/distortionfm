@@ -6,6 +6,7 @@
 }
 
 body {
+    font-family: YakuHanJP, "Noto Sans JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
     width: 100%;
     white-space: normal;
 }
@@ -64,6 +65,5 @@ li .pure-menu-link {
 }
 
 p {
-    font-family: Georgia, "Cambria", serif;
     line-height: 1.8em;
 }
