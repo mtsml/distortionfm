@@ -75,7 +75,10 @@ const Episode = ({ episode }: Props) => {
 
         // transcriptionが枠内の上部に表示されるようスクロールする
         const scrollY = activeTranscriptionElem.offsetTop - transcriptionWrapperElem.offsetTop - offsetScrollY;
-        transcriptionWrapperElem.scroll(0, scrollY);
+        transcriptionWrapperElem.scroll({
+          top: scrollY,
+          behavior: "smooth"
+        });
       }
     }
   }
