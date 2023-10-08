@@ -73,3 +73,17 @@ p {
   padding-right: 0.5rem;
   vertical-align: bottom;
 }
+
+.transcription {
+  padding: 0.5rem;
+  background-color: #eee;
+  border-radius: 0.5rem;
+  overflow-y: scroll;
+  max-height: 60vh;
+}
+
+.transcription p {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}

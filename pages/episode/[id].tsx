@@ -38,7 +38,12 @@ const Episode = ({ episode }: Props) => {
     // transcription
     if (episode.transcription) {
       const transcription = document.createElement("div");
-      transcription.innerText = episode.transcription;
+      transcription.classList.add("transcription");
+      episode.transcription.split("\n").forEach(text => {
+        const p = document.createElement("p");
+        p.innerText = text;
+        transcription.appendChild(p);
+      })
       main.appendChild(transcription);
     }
 
