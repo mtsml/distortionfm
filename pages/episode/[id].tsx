@@ -11,6 +11,7 @@ interface Episode {
   id: string;
   title: string;
   isoDate: string;
+  enclosure: Parser.Enclosure;
   description: string;
   transcription: string;
 }
@@ -29,11 +30,6 @@ const Episode = ({ episode }: Props) => {
     const parsedDescription = parser.parseFromString(episode.description, "text/html")
     const descriptions = Array.from(parsedDescription.body.childNodes);
     descriptions.forEach(description => main.appendChild(description));
-
-    // isoDate
-    const isoDate = document.createElement("p");
-    isoDate.innerText = episode.isoDate;
-    main.appendChild(isoDate);
 
     // transcription
     if (episode.transcription) {
@@ -59,12 +55,8 @@ const Episode = ({ episode }: Props) => {
         <div className="contents pure-u-1 pure-u-xl-3-4">
           <main>
             <h1>{episode.title}</h1>
-            <iframe
-              src={`https://podcasters.spotify.com/pod/show/matsumaru/embed/episodes/${episode.id}`}
-              width="100%"
-              frameBorder="0"
-              scrolling="no"
-            ></iframe>
+            <p>{episode.isoDate}</p>
+            <audio src={episode.enclosure.url} controls></audio>
           </main>
           <Footer />
         </div>
@@ -94,10 +86,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const id = context.params ? context.params.id as string : "";
 
   // RSS
-  const parser = new Parser();
+  const parser = new Parser({
+    customFields: {
+      item: ["enclosure"]
+    }
+  });
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
-  const episode = feed.items.find(item => item.link?.includes(id)) || {};
-  const { title, isoDate, content } = episode;
+  const episode = feed.items.find(item => item.link?.includes(id)) || null;
+  if (!episode) return  { props: { episode: {} } }
+  const { title , isoDate, content, enclosure } = episode;
 
   // DB
   const { rows } = await sql`SELECT * FROM episode WHERE id = ${id}`;
@@ -109,6 +106,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         id,
         title,
         isoDate,
+        enclosure,
         description: content,
         transcription
       }
