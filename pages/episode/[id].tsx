@@ -52,14 +52,31 @@ const Episode = ({ episode }: Props) => {
   }
 
   /**
-   * 現在再生している時間のtranscriptionをactiveにする
+   * 現在再生している時間帯のtranscriptionをactiveにする
    */
   const updateActiveTranscription = (): void => {
-    if (audioRef.current?.currentTime) {
-      const cuerentTime = audioRef.current?.currentTime;
-      const activeTranscription = episode.transcriptions
-        .find(transcription => transcription.start_sec <= cuerentTime && cuerentTime < transcription.end_sec);
-      activeTranscription && setActiveTranscriptionSec(activeTranscription?.start_sec);
+    if (!audioRef.current?.currentTime) return;
+
+    const cuerentTime = audioRef.current?.currentTime;
+    const activeTranscription = episode.transcriptions.find(
+      transcription => transcription.start_sec <= cuerentTime && cuerentTime < transcription.end_sec
+    );
+
+    // onTimeUpdateは1s内で複数発行されるため、activeTranscriptionSecの値が変わる場合のみstateを更新する
+    if (activeTranscription && activeTranscription.start_sec !== activeTranscriptionSec) {
+      setActiveTranscriptionSec(activeTranscription?.start_sec);
+
+      const transcriptionWrapperElem = document.getElementById("transcriptionWrapper");
+      const activeTranscriptionElem = document.getElementById(String(activeTranscription.start_sec));
+      if (transcriptionWrapperElem && activeTranscriptionElem) {
+        // 直前のtranscriptionを枠内に表示する
+        const previousTranscriptionElem = activeTranscriptionElem.previousElementSibling as HTMLElement;
+        const offsetScrollY = previousTranscriptionElem?.offsetHeight + 12 || 0;
+
+        // transcriptionが枠内の上部に表示されるようスクロールする
+        const scrollY = activeTranscriptionElem.offsetTop - transcriptionWrapperElem.offsetTop - offsetScrollY;
+        transcriptionWrapperElem.scroll(0, scrollY);
+      }
     }
   }
 
@@ -83,9 +100,10 @@ const Episode = ({ episode }: Props) => {
                 controls
               ></audio>
             </p>
-            <div className="transcription">
+            <div id="transcriptionWrapper" className="transcription">
               {episode.transcriptions.map(transcription => (
                 <p
+                  id={String(transcription.start_sec)}
                   key={transcription.start_sec}
                   className={transcription.start_sec === activeTranscriptionSec ? "active" : ""}
                   data-start-sec={String(transcription.start_sec)}
