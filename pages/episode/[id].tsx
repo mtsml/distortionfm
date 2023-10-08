@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Parser from "rss-parser";
@@ -7,13 +7,19 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
 
+interface Transcription {
+  text: string;
+  start_sec: number;
+  end_sec: number;
+}
+
 interface Episode {
   id: string;
   title: string;
   isoDate: string;
   enclosure: Parser.Enclosure;
   description: string;
-  transcription: string;
+  transcriptions: Transcription[];
 }
 
 interface Props {
@@ -21,29 +27,41 @@ interface Props {
 } 
 
 const Episode = ({ episode }: Props) => {
+  const [activeTranscriptionSec, setActiveTranscriptionSec] = useState<number>(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const main = document.getElementsByTagName("main")[0];
 
     // description
-    const parser = new DOMParser();
-    const parsedDescription = parser.parseFromString(episode.description, "text/html")
-    const descriptions = Array.from(parsedDescription.body.childNodes);
-    descriptions.forEach(description => main.appendChild(description));
-
-    // transcription
-    if (episode.transcription) {
-      const transcription = document.createElement("div");
-      transcription.classList.add("transcription");
-      episode.transcription.split("\n").forEach(text => {
-        const p = document.createElement("p");
-        p.innerText = text;
-        transcription.appendChild(p);
-      })
-      main.appendChild(transcription);
-    }
+    // const parser = new DOMParser();
+    // const parsedDescription = parser.parseFromString(episode.description, "text/html")
+    // const descriptions = Array.from(parsedDescription.body.childNodes);
+    // descriptions.forEach(description => main.appendChild(description));
 
   }, []);
+
+  /**
+   * チャプター切り替え
+   */
+  const jumpToChapter = (time: number): void => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      audioRef.current.play();
+    }
+  }
+
+  /**
+   * 現在再生している時間のtranscriptionをactiveにする
+   */
+  const updateActiveTranscription = (): void => {
+    if (audioRef.current?.currentTime) {
+      const cuerentTime = audioRef.current?.currentTime;
+      const activeTranscription = episode.transcriptions
+        .find(transcription => transcription.start_sec <= cuerentTime && cuerentTime < transcription.end_sec);
+      activeTranscription && setActiveTranscriptionSec(activeTranscription?.start_sec);
+    }
+  }
 
   return (
     <>
@@ -56,7 +74,27 @@ const Episode = ({ episode }: Props) => {
           <main>
             <h1>{episode.title}</h1>
             <p>{episode.isoDate}</p>
-            <audio src={episode.enclosure.url} controls></audio>
+            <p>
+              <audio
+                ref={audioRef}
+                className="player"
+                src={episode.enclosure.url}
+                onTimeUpdate={() => updateActiveTranscription()}
+                controls
+              ></audio>
+            </p>
+            <div className="transcription">
+              {episode.transcriptions.map(transcription => (
+                <p
+                  key={transcription.start_sec}
+                  className={transcription.start_sec === activeTranscriptionSec ? "active" : ""}
+                  data-start-sec={String(transcription.start_sec)}
+                  onClick={() => jumpToChapter(transcription.start_sec)}
+                >
+                  {transcription.text}
+                </p>
+              ))}
+            </div>
           </main>
           <Footer />
         </div>
@@ -97,8 +135,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const { title , isoDate, content, enclosure } = episode;
 
   // DB
-  const { rows } = await sql`SELECT * FROM episode WHERE id = ${id}`;
-  const transcription = rows.length > 0 ? rows[0].transcription : null;
+  const { rows } = await sql`
+    SELECT text, start_sec, end_sec
+    FROM vtt
+    WHERE id = ${id}
+    ORDER BY start_sec
+  `;
 
   return {
     props: {
@@ -108,7 +150,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         isoDate,
         enclosure,
         description: content,
-        transcription
+        transcriptions: rows || []
       }
     }
   }
