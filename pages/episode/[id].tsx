@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Parser from "rss-parser";
+import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
@@ -11,6 +12,7 @@ interface Episode {
   title: string;
   isoDate: string;
   description: string;
+  transcription: string;
 }
 
 interface Props {
@@ -32,6 +34,14 @@ const Episode = ({ episode }: Props) => {
     const isoDate = document.createElement("p");
     isoDate.innerText = episode.isoDate;
     main.appendChild(isoDate);
+
+    // transcription
+    if (episode.transcription) {
+      const transcription = document.createElement("div");
+      transcription.innerText = episode.transcription;
+      main.appendChild(transcription);
+    }
+
   }, []);
 
   return (
@@ -78,11 +88,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async (context) => {
   const id = context.params ? context.params.id as string : "";
 
+  // RSS
   const parser = new Parser();
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
-
   const episode = feed.items.find(item => item.link?.includes(id)) || {};
   const { title, isoDate, content } = episode;
+
+  // DB
+  const { rows } = await sql`SELECT * FROM episode WHERE id = ${id}`;
+  const transcription = rows.length > 0 ? rows[0].transcription : null;
 
   return {
     props: {
@@ -90,7 +104,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
         id,
         title,
         isoDate,
-        description: content
+        description: content,
+        transcription
       }
     }
   }
