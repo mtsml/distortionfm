@@ -27,18 +27,18 @@ interface Props {
 } 
 
 const Episode = ({ episode }: Props) => {
+  const [activeTab, setActiveTab] = useState<number>(0);
   const [activeTranscriptionSec, setActiveTranscriptionSec] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    const main = document.getElementsByTagName("main")[0];
-
     // description
-    // const parser = new DOMParser();
-    // const parsedDescription = parser.parseFromString(episode.description, "text/html")
-    // const descriptions = Array.from(parsedDescription.body.childNodes);
-    // descriptions.forEach(description => main.appendChild(description));
-
+    const descriptionWrapper = document.getElementById("descriptionWrapper");
+    if (!descriptionWrapper) return;
+    const parser = new DOMParser();
+    const parsedDescription = parser.parseFromString(episode.description, "text/html")
+    const descriptions = Array.from(parsedDescription.body.childNodes);
+    descriptions.forEach(description => descriptionWrapper.appendChild(description));
   }, []);
 
   /**
@@ -92,8 +92,7 @@ const Episode = ({ episode }: Props) => {
         <div className="contents pure-u-1 pure-u-xl-3-4">
           <main>
             <h1>{episode.title}</h1>
-            <p>{episode.date}</p>
-            <p>
+            <div>
               <audio
                 ref={audioRef}
                 className="player"
@@ -101,19 +100,42 @@ const Episode = ({ episode }: Props) => {
                 onTimeUpdate={() => updateActiveTranscription()}
                 controls
               ></audio>
-            </p>
-            <div id="transcriptionWrapper" className="transcription">
-              {episode.transcriptions.map(transcription => (
-                <p
-                  id={String(transcription.start_sec)}
-                  key={transcription.start_sec}
-                  className={transcription.start_sec === activeTranscriptionSec ? "active" : ""}
-                  onClick={() => jumpToChapter(transcription.start_sec)}
-                >
-                  {transcription.text}
-                </p>
-              ))}
             </div>
+            <div>
+              <a
+                className={`tab${activeTab === 0 ? " active" : ""}`}
+                onClick={() => setActiveTab(0)}
+              >
+                説明
+              </a>
+              {episode.transcriptions.length !== 0 && (
+                <a
+                  className={`tab${activeTab === 1 ? " active" : ""}`}
+                  onClick={() => setActiveTab(1)}
+                >
+                  文字起こし
+                </a>
+              )}
+            </div>
+            {activeTab === 0 && (
+              <div id="descriptionWrapper">
+                <p>{episode.date}</p>
+              </div>
+            )}
+            {activeTab === 1 && (
+              <div id="transcriptionWrapper" className="transcription">
+                {episode.transcriptions.map(transcription => (
+                  <p
+                    id={String(transcription.start_sec)}
+                    key={transcription.start_sec}
+                    className={transcription.start_sec === activeTranscriptionSec ? "active" : ""}
+                    onClick={() => jumpToChapter(transcription.start_sec)}
+                  >
+                    {transcription.text}
+                  </p>
+                ))}
+              </div>
+            )}
           </main>
           <Footer />
         </div>
