@@ -45,19 +45,18 @@ const Episode = ({ episode }: Props) => {
    * チャプター切り替え
    */
   const jumpToChapter = (time: number): void => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      audioRef.current.play();
-    }
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = time;
+    audioRef.current.play();
   }
 
   /**
    * 現在再生している時間帯のtranscriptionをactiveにする
    */
   const updateActiveTranscription = (): void => {
-    if (!audioRef.current?.currentTime) return;
+    if (!audioRef.current) return;
 
-    const cuerentTime = audioRef.current?.currentTime;
+    const cuerentTime = audioRef.current.currentTime;
     const activeTranscription = episode.transcriptions.find(
       transcription => transcription.start_sec <= cuerentTime && cuerentTime < transcription.end_sec
     );
@@ -109,7 +108,6 @@ const Episode = ({ episode }: Props) => {
                   id={String(transcription.start_sec)}
                   key={transcription.start_sec}
                   className={transcription.start_sec === activeTranscriptionSec ? "active" : ""}
-                  data-start-sec={String(transcription.start_sec)}
                   onClick={() => jumpToChapter(transcription.start_sec)}
                 >
                   {transcription.text}
@@ -151,7 +149,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     }
   });
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
-  const episode = feed.items.find(item => item.link?.includes(id)) || null;
+  const episode = feed.items.find(item => item.link?.includes(id));
   if (!episode) return  { props: { episode: {} } }
   const { title , isoDate, content, enclosure } = episode;
 
