@@ -117,25 +117,21 @@ const Episode = ({ episode }: Props) => {
                 </a>
               )}
             </div>
-            {activeTab === 0 && (
-              <div id="descriptionWrapper">
-                <p>{episode.date}</p>
-              </div>
-            )}
-            {activeTab === 1 && (
-              <div id="transcriptionWrapper" className="transcription">
-                {episode.transcriptions.map(transcription => (
-                  <p
-                    id={String(transcription.start_sec)}
-                    key={transcription.start_sec}
-                    className={transcription.start_sec === activeTranscriptionSec ? "active" : ""}
-                    onClick={() => jumpToChapter(transcription.start_sec)}
-                  >
-                    {transcription.text}
-                  </p>
-                ))}
-              </div>
-            )}
+            <div id="descriptionWrapper" style={{ display: activeTab === 0 ? "block" : "none" }}>
+              <p>{episode.date}</p>
+            </div>
+            <div id="transcriptionWrapper" className="transcription" style={{ display: activeTab === 1 ? "block" : "none" }}>
+              {episode.transcriptions.map(transcription => (
+                <p
+                  id={String(transcription.start_sec)}
+                  key={transcription.start_sec}
+                  className={transcription.start_sec === activeTranscriptionSec ? "active" : ""}
+                  onClick={() => jumpToChapter(transcription.start_sec)}
+                >
+                  {transcription.text}
+                </p>
+              ))}
+            </div>
           </main>
           <Footer />
         </div>
