@@ -16,7 +16,7 @@ interface Transcription {
 interface Episode {
   id: string;
   title: string;
-  isoDate: string;
+  date: string;
   enclosure: Parser.Enclosure;
   description: string;
   transcriptions: Transcription[];
@@ -93,7 +93,7 @@ const Episode = ({ episode }: Props) => {
         <div className="contents pure-u-1 pure-u-xl-3-4">
           <main>
             <h1>{episode.title}</h1>
-            <p>{episode.isoDate}</p>
+            <p>{episode.date}</p>
             <p>
               <audio
                 ref={audioRef}
@@ -168,7 +168,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       episode: {
         id,
         title,
-        isoDate,
+        date: isoDate && (new Date(isoDate)).toLocaleDateString('ja-JP'),
         enclosure,
         description: content,
         transcriptions: rows || []
