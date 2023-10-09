@@ -46,7 +46,8 @@ const Episode = ({ episode }: Props) => {
    */
   const jumpToChapter = (time: number): void => {
     if (!audioRef.current) return;
-    audioRef.current.currentTime = time;
+    // ms -> s
+    audioRef.current.currentTime = time / 1000;
     audioRef.current.play();
   }
 
@@ -56,9 +57,9 @@ const Episode = ({ episode }: Props) => {
   const updateActiveTranscription = (): void => {
     if (!audioRef.current) return;
 
-    const cuerentTime = audioRef.current.currentTime;
+    const cuerentMs = audioRef.current.currentTime * 1000;
     const activeTranscription = episode.transcriptions.find(
-      transcription => transcription.start_sec <= cuerentTime && cuerentTime < transcription.end_sec
+      transcription => transcription.start_sec <= cuerentMs && cuerentMs < transcription.end_sec
     );
 
     // onTimeUpdateは1s内で複数発行されるため、activeTranscriptionSecの値が変わる場合のみstateを更新する
