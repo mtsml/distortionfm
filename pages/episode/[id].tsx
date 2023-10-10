@@ -62,9 +62,9 @@ const Episode = ({ episode }: Props) => {
       transcription => transcription.start_sec <= cuerentMs && cuerentMs < transcription.end_sec
     );
 
-    // onTimeUpdateは1s内で複数発行されるため、activeTranscriptionSecの値が変わる場合のみstateを更新する
+    // 負荷を抑えるためactiveTranscriptionSecの値が変わる場合のみstateを更新する
     if (activeTranscription && activeTranscription.start_sec !== activeTranscriptionSec) {
-      setActiveTranscriptionSec(activeTranscription?.start_sec);
+      setActiveTranscriptionSec(activeTranscription.start_sec);
 
       const transcriptionWrapperElem = document.getElementById("transcriptionWrapper");
       const activeTranscriptionElem = document.getElementById(String(activeTranscription.start_sec));
