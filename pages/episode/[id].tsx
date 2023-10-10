@@ -25,7 +25,7 @@ interface Episode {
 
 interface Props {
   episode: Episode;
-} 
+}
 
 const Episode = ({ episode }: Props) => {
   const [activeTabIdx, setActiveTabIdx] = useState<number>(0);
@@ -33,14 +33,29 @@ const Episode = ({ episode }: Props) => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    // description
+    // descriptionを生成する。DOMParserを利用するためSSGではなくCSRを採用
     const descriptionWrapper = document.getElementById("descriptionWrapper");
     if (!descriptionWrapper) return;
+
     const parser = new DOMParser();
     const parsedDescription = parser.parseFromString(episode.description, "text/html")
-    const descriptions = Array.from(parsedDescription.body.childNodes);
-    descriptions.forEach(description => descriptionWrapper.appendChild(description));
+    const descriptions = Array.from(parsedDescription.body.children);
+    descriptions.forEach(description => {
+      addClass(description);
+      descriptionWrapper.appendChild(description)
+    });
   }, []);
+
+  /**
+   * 再帰的にclassを付与していく
+   */
+  const addClass = (elem: Element): void => {
+    if (elem.nodeName === "UL") elem.classList.add("pure-menu");
+    if (elem.nodeName === "LI") elem.classList.add("pure-menu-item");
+    if (elem.nodeName === "A") elem.classList.add("pure-menu-link");
+
+    Array.from(elem.children).forEach(child => addClass(child));
+  }
 
   /**
    * 指定の秒数から再生する
