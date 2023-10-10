@@ -80,7 +80,7 @@ p {
   margin-bottom: 1rem;
 }
 
-.transcription {
+#transcriptWrapper {
   padding: 0.5rem;
   background-color: #eee;
   border-radius: 0.5rem;
@@ -88,7 +88,7 @@ p {
   max-height: 60vh;
 }
 
-.transcription p {
+#transcriptWrapper p {
   cursor: pointer;
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -96,7 +96,7 @@ p {
   transition: all 0.2s 0.2s ease-out;
 }
 
-.transcription p.active {
+#transcriptWrapper p.active {
   padding: 0.5rem;
   background-color: #fff;
   border-radius: 0.3rem;

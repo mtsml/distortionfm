@@ -5,12 +5,12 @@ import Parser from "rss-parser";
 import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getIdFromAnchorRssFeedItem } from "@/util/utility";
+import { getIdFromAnchorRssFeedItem, toSimpleDateFormat } from "@/util/utility";
 
-interface Transcription {
-  text: string;
-  start_sec: number;
-  end_sec: number;
+interface Transcript {
+  transcript: string;
+  startMs: number;
+  endMs: number;
 }
 
 interface Episode {
@@ -19,7 +19,7 @@ interface Episode {
   date: string;
   enclosure: Parser.Enclosure;
   description: string;
-  transcriptions: Transcription[];
+  transcripts: Transcript[];
 }
 
 interface Props {
@@ -27,8 +27,8 @@ interface Props {
 } 
 
 const Episode = ({ episode }: Props) => {
-  const [activeTab, setActiveTab] = useState<number>(0);
-  const [activeTranscriptionSec, setActiveTranscriptionSec] = useState<number>(0);
+  const [activeTabIdx, setActiveTabIdx] = useState<number>(0);
+  const [activeTranscriptMs, setActiveTranscriptMs] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -42,40 +42,41 @@ const Episode = ({ episode }: Props) => {
   }, []);
 
   /**
-   * チャプター切り替え
+   * 指定の秒数から再生する
    */
-  const jumpToChapter = (time: number): void => {
+  const playFrom = (ms: number): void => {
     if (!audioRef.current) return;
     // ms -> s
-    audioRef.current.currentTime = time / 1000;
+    audioRef.current.currentTime = ms / 1000;
     audioRef.current.play();
   }
 
   /**
-   * 現在再生している時間帯のtranscriptionをactiveにする
+   * 現在再生している時間帯のtranscriptをactiveにする
    */
-  const updateActiveTranscription = (): void => {
+  const updateActiveTranscript = (): void => {
     if (!audioRef.current) return;
 
-    const cuerentMs = audioRef.current.currentTime * 1000;
-    const activeTranscription = episode.transcriptions.find(
-      transcription => transcription.start_sec <= cuerentMs && cuerentMs < transcription.end_sec
+    // s -> ms
+    const currentMs = audioRef.current.currentTime * 1000;
+    const activeTranscript = episode.transcripts.find(
+      transcript => transcript.startMs <= currentMs && currentMs < transcript.endMs
     );
 
-    // 負荷を抑えるためactiveTranscriptionSecの値が変わる場合のみstateを更新する
-    if (activeTranscription && activeTranscription.start_sec !== activeTranscriptionSec) {
-      setActiveTranscriptionSec(activeTranscription.start_sec);
+    // 負荷を抑えるためactiveTranscriptMsの値が変わる場合のみstateを更新する
+    if (activeTranscript && activeTranscript.startMs !== activeTranscriptMs) {
+      setActiveTranscriptMs(activeTranscript.startMs);
 
-      const transcriptionWrapperElem = document.getElementById("transcriptionWrapper");
-      const activeTranscriptionElem = document.getElementById(String(activeTranscription.start_sec));
-      if (transcriptionWrapperElem && activeTranscriptionElem) {
-        // 直前のtranscriptionを枠内に表示する
-        const previousTranscriptionElem = activeTranscriptionElem.previousElementSibling as HTMLElement;
-        const offsetScrollY = previousTranscriptionElem?.offsetHeight + 12 || 0;
+      const transcriptWrapperElem = document.getElementById("transcriptWrapper");
+      const activeTranscriptElem = document.getElementById(String(activeTranscript.startMs));
+      if (transcriptWrapperElem && activeTranscriptElem) {
+        // 直前のtranscriptを枠内に表示するためのoffsetを計算する
+        const previousTranscriptElem = activeTranscriptElem.previousElementSibling as HTMLElement;
+        const offsetScrollY = previousTranscriptElem?.offsetHeight + 12 || 0;
 
-        // transcriptionが枠内の上部に表示されるようスクロールする
-        const scrollY = activeTranscriptionElem.offsetTop - transcriptionWrapperElem.offsetTop - offsetScrollY;
-        transcriptionWrapperElem.scroll({
+        // transcriptが枠内の上部に表示されるようスクロールする
+        const scrollY = activeTranscriptElem.offsetTop - transcriptWrapperElem.offsetTop - offsetScrollY;
+        transcriptWrapperElem.scroll({
           top: scrollY,
           behavior: "smooth"
         });
@@ -98,38 +99,45 @@ const Episode = ({ episode }: Props) => {
                 ref={audioRef}
                 className="player"
                 src={episode.enclosure.url}
-                onTimeUpdate={() => updateActiveTranscription()}
+                onTimeUpdate={() => updateActiveTranscript()}
                 controls
               ></audio>
             </div>
             <div>
               <a
-                className={`tab${activeTab === 0 ? " active" : ""}`}
-                onClick={() => setActiveTab(0)}
+                className={`tab${activeTabIdx === 0 ? " active" : ""}`}
+                onClick={() => setActiveTabIdx(0)}
               >
                 説明
               </a>
-              {episode.transcriptions.length !== 0 && (
+              {episode.transcripts.length !== 0 && (
                 <a
-                  className={`tab${activeTab === 1 ? " active" : ""}`}
-                  onClick={() => setActiveTab(1)}
+                  className={`tab${activeTabIdx === 1 ? " active" : ""}`}
+                  onClick={() => setActiveTabIdx(1)}
                 >
                   文字起こし
                 </a>
               )}
             </div>
-            <div id="descriptionWrapper" style={{ display: activeTab === 0 ? "block" : "none" }}>
+            <div
+              id="descriptionWrapper"
+              style={{ display: activeTabIdx === 0 ? "block" : "none" }}
+            >
               <p>{episode.date}</p>
             </div>
-            <div id="transcriptionWrapper" className="transcription" style={{ display: activeTab === 1 ? "block" : "none" }}>
-              {episode.transcriptions.map(transcription => (
+            <div
+              id="transcriptWrapper"
+              className="transcript"
+              style={{ display: activeTabIdx === 1 ? "block" : "none" }}
+            >
+              {episode.transcripts.map(transcript => (
                 <p
-                  id={String(transcription.start_sec)}
-                  key={transcription.start_sec}
-                  className={transcription.start_sec === activeTranscriptionSec ? "active" : ""}
-                  onClick={() => jumpToChapter(transcription.start_sec)}
+                  id={String(transcript.startMs)}
+                  key={transcript.startMs}
+                  className={transcript.startMs === activeTranscriptMs ? "active" : ""}
+                  onClick={() => playFrom(transcript.startMs)}
                 >
-                  {transcription.text}
+                  {transcript.transcript}
                 </p>
               ))}
             </div>
@@ -174,10 +182,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   // DB
   const { rows } = await sql`
-    SELECT text, start_sec, end_sec
+    SELECT transcript, start_ms AS "startMs", end_ms AS "endMs"
     FROM vtt
     WHERE id = ${id}
-    ORDER BY start_sec
+    ORDER BY start_ms
   `;
 
   return {
@@ -185,10 +193,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
       episode: {
         id,
         title,
-        date: isoDate && (new Date(isoDate)).toLocaleDateString('ja-JP'),
+        date: toSimpleDateFormat(isoDate),
         enclosure,
         description: content,
-        transcriptions: rows || []
+        transcripts: rows || []
       }
     }
   }

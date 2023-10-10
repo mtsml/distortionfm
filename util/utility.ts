@@ -9,3 +9,10 @@ export const getIdFromAnchorRssFeedItem = (item: Parser.Item): string => {
   }
   return id;
 }
+
+/**
+ * 日時を表す文字列をyyyy/MM/ddに変換する
+ */
+export const toSimpleDateFormat = (dateString: string | undefined): string | undefined => {
+  return dateString && (new Date(dateString)).toLocaleDateString('ja-JP');
+}
