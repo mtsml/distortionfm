@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Parser from "rss-parser";
+import clsx from "clsx";
 import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -105,14 +106,14 @@ const Episode = ({ episode }: Props) => {
             </div>
             <div>
               <a
-                className={`tab${activeTabIdx === 0 ? " active" : ""}`}
+                className={clsx("tab", { active: activeTabIdx === 0})}
                 onClick={() => setActiveTabIdx(0)}
               >
                 説明
               </a>
               {episode.transcripts.length !== 0 && (
                 <a
-                  className={`tab${activeTabIdx === 1 ? " active" : ""}`}
+                  className={clsx("tab", { active: activeTabIdx === 1})}
                   onClick={() => setActiveTabIdx(1)}
                 >
                   文字起こし
@@ -134,7 +135,7 @@ const Episode = ({ episode }: Props) => {
                 <p
                   id={String(transcript.startMs)}
                   key={transcript.startMs}
-                  className={transcript.startMs === activeTranscriptMs ? "active" : ""}
+                  className={clsx({ active: transcript.startMs === activeTranscriptMs })}
                   onClick={() => playFrom(transcript.startMs)}
                 >
                   {transcript.transcript}
