@@ -11,6 +11,10 @@ body {
   white-space: normal;
 }
 
+main {
+  margin-bottom: 0.5em;
+}
+
 header {
   background-color: rgb(61, 79, 93);
   color: #fff;
@@ -30,7 +34,7 @@ header a {
   color: rgb(92, 163, 209);
 }
 
-h1 {
+h2 {
   border-bottom: 1px solid #eee;
   padding: 0.4em 0.2em;
   margin-top: 0;

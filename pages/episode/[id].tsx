@@ -109,7 +109,7 @@ const Episode = ({ episode }: Props) => {
         <Header />
         <div className="contents pure-u-1 pure-u-xl-3-4">
           <main>
-            <h1>{episode.title}</h1>
+            <h2>{episode.title}</h2>
             <div>
               <audio
                 ref={audioRef}
