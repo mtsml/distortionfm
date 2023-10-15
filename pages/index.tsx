@@ -21,7 +21,7 @@ const Home = ({ episodes }: Props) => {
       <Header />
       <div className="contents pure-u-1 pure-u-xl-3-4">
         <main>
-          <h1>Episodes</h1>
+          <h2>Episodes</h2>
           <div id="episodes" className="pure-menu">
             {episodes.map(episode => (
               <div key={episode.id} className="pure-menu-item">

@@ -22,7 +22,7 @@ const PLATFORMS = [
 const Footer = () => {
   return (
     <footer>
-      <h1>Subscribe</h1>
+      <h2>Subscribe</h2>
       <ul className="pure-menu">
         {PLATFORMS.map((PLATFORM, idx) => (
           <li key={idx} className="pure-menu-item">
