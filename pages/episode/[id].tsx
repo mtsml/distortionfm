@@ -41,20 +41,20 @@ const Episode = ({ episode }: Props) => {
     const parsedDescription = parser.parseFromString(episode.description, "text/html")
     const descriptions = Array.from(parsedDescription.body.children);
     descriptions.forEach(description => {
-      addClass(description);
+      addClassRecursively(description);
       descriptionWrapper.appendChild(description)
     });
   }, []);
 
   /**
-   * 再帰的にclassを付与していく
+   * 再帰的にclassを付与する
    */
-  const addClass = (elem: Element): void => {
+  const addClassRecursively = (elem: Element): void => {
     if (elem.nodeName === "UL") elem.classList.add("pure-menu");
     if (elem.nodeName === "LI") elem.classList.add("pure-menu-item");
     if (elem.nodeName === "A") elem.classList.add("pure-menu-link");
 
-    Array.from(elem.children).forEach(child => addClass(child));
+    Array.from(elem.children).forEach(child => addClassRecursively(child));
   }
 
   /**
@@ -75,8 +75,8 @@ const Episode = ({ episode }: Props) => {
 
     // s -> ms
     const currentMs = audioRef.current.currentTime * 1000;
-    const activeTranscript = episode.transcripts.find(
-      transcript => transcript.startMs <= currentMs && currentMs < transcript.endMs
+    const activeTranscript = episode.transcripts.find(transcript =>
+      transcript.startMs <= currentMs && currentMs < transcript.endMs
     );
 
     // 負荷を抑えるためactiveTranscriptMsの値が変わる場合のみstateを更新する
