@@ -4,16 +4,22 @@ import { faBell } from "@fortawesome/free-solid-svg-icons";
 
 const Header = () => {
   const registerNotification = () => {
-    Notification.requestPermission().then((permission) => {
-      if (permission === "granted") {
-        const title = "通知確認";
-        const options = {
-          body: "通知設定が完了しました。こんな感じで最新エピソードの追加をお知らせするよ。",
-          icon: "/favicon.ico"
+    try {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          const title = "通知確認";
+          const options = {
+            body: "通知設定が完了しました。こんな感じで最新エピソードの追加をお知らせするよ。",
+            // icon: "/favicon.ico"
+          }
+          new Notification(title, options);
+        } else {
+          alert("permission denied");
         }
-        new Notification(title, options);
-      }
-    });
+      });
+    } catch(e) {
+      alert(e)
+    }
   };
 
   return (
