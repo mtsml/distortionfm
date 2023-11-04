@@ -130,3 +130,8 @@ p {
     min-height: 100vh;
   }
 }
+
+.notification {
+  vertical-align: baseline;
+  padding-left: 0.5em;
+}
