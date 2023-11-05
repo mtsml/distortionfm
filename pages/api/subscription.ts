@@ -33,6 +33,10 @@ const post = async (req: NextApiRequest, res: NextApiResponse) => {
   );
 
   // DB登録
+  await sql`
+    INSERT INTO subscription(endpoint, keys_p256dh, keys_auth)
+    VALUES(${subscription.endpoint}, ${subscription.keys.p256dh}, ${subscription.keys.auth})
+  `;
 
   res.status(201).end();
 }
