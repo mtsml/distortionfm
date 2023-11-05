@@ -12,10 +12,11 @@ const App = ({ Component, pageProps }: AppProps) => {
       try {
         navigator.serviceWorker.register("/service-worker.js");
       } catch (e) {
-        console.log('error', e)
+        console.log("error", e);
+        alert("深刻なエラーが発生しました。。。\nFaild to register ServiceWorker");
       }
     }
-  });
+  }, []);
 
   const gtag = process.env.NEXT_PUBLIC_GA_ID;
   return (

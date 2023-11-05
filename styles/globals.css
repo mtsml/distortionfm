@@ -131,7 +131,8 @@ p {
   }
 }
 
-.notification {
+.subscribe-icon {
+  cursor: pointer;
   vertical-align: baseline;
   padding-left: 0.5em;
 }
