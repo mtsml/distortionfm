@@ -136,3 +136,7 @@ p {
   vertical-align: baseline;
   padding-left: 0.5em;
 }
+
+.subscribe-icon.enabled {
+  color: goldenrod;
+}

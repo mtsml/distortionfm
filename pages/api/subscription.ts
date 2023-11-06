@@ -11,16 +11,18 @@ webPush.setVapidDetails(
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    await post(req, res);
+    await postMethod(req, res);
   } else if (req.method === "PUT") {
-    await put(req, res);
+    await putMethod(req, res);
+  } else if (req.method === "DELETE") {
+    await deleteMethod(req, res);
   } else {
     // Method Not Allowed
     res.status(405).end();
   }
 }
 
-const post = async (req: NextApiRequest, res: NextApiResponse) => {
+const postMethod = async (req: NextApiRequest, res: NextApiResponse) => {
   const subscription = {
     endpoint: req.body.subscription.endpoint,
     keys: req.body.subscription.keys
@@ -43,7 +45,7 @@ const post = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(201).end();
 }
 
-const put = async (req: NextApiRequest, res: NextApiResponse) => {
+const putMethod = async (req: NextApiRequest, res: NextApiResponse) => {
   const subscription = {
     endpoint: req.body.subscription.endpoint,
     keys: req.body.subscription.keys
@@ -65,7 +67,19 @@ const put = async (req: NextApiRequest, res: NextApiResponse) => {
     VALUES(${subscription.endpoint}, ${subscription.keys.p256dh}, ${subscription.keys.auth})
   `;
 
-  res.status(201).end();
+  res.status(200).end();
+}
+
+const deleteMethod = async (req: NextApiRequest, res: NextApiResponse) => {
+  const endpoint = req.body.subscription.endpoint;
+
+  // DELETE
+  await sql`
+    DELETE FROM subscription
+    WHERE endpoint = ${endpoint}
+  `;
+
+  res.status(200).end();
 }
 
 export default handler;
