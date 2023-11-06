@@ -54,6 +54,7 @@ const Header = () => {
         });
 
         setSubscribingNotifications(true);
+        navigator.vibrate(200);
       }
     } catch(e) {
       console.log("error", e);
