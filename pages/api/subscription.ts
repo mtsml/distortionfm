@@ -12,6 +12,8 @@ webPush.setVapidDetails(
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     await post(req, res);
+  } else if (req.method === "PUT") {
+    await put(req, res);
   } else {
     // Method Not Allowed
     res.status(405).end();
@@ -32,7 +34,32 @@ const post = async (req: NextApiRequest, res: NextApiResponse) => {
     })
   );
 
-  // DB登録
+  // INSERT
+  await sql`
+    INSERT INTO subscription(endpoint, keys_p256dh, keys_auth)
+    VALUES(${subscription.endpoint}, ${subscription.keys.p256dh}, ${subscription.keys.auth})
+  `;
+
+  res.status(201).end();
+}
+
+const put = async (req: NextApiRequest, res: NextApiResponse) => {
+  const subscription = {
+    endpoint: req.body.subscription.endpoint,
+    keys: req.body.subscription.keys
+  }
+
+  const oldEndpoint = req.body.oldEndpoint;
+
+  if (oldEndpoint) {
+    // DELETE
+    await sql`
+      DELETE FROM subscription
+      WHERE endpoint = ${oldEndpoint}
+    `;
+  }
+
+  // INSERT
   await sql`
     INSERT INTO subscription(endpoint, keys_p256dh, keys_auth)
     VALUES(${subscription.endpoint}, ${subscription.keys.p256dh}, ${subscription.keys.auth})

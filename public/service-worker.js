@@ -36,3 +36,22 @@ self.addEventListener("notificationclick", (event) => {
     clients.openWindow(event.notification.data?.url || "/")
   )
 });
+
+self.addEventListener("pushsubscriptionchange", (event) => {
+  event.waitUntil(
+    self.registration.pushManager
+      .subscribe(event.oldSubscription.options)
+      .then((subscription) =>
+        fetch("/api/subscription", {
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            oldEndpoint: event.oldSubscription.endpoint,
+            subscription,
+          }),
+        })
+      )
+  );
+});
