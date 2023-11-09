@@ -1,16 +1,17 @@
-const installEvent = () => {
-  self.addEventListener("install", () => {
-    console.log("service worker installed");
-  });
-};
-installEvent();
+self.addEventListener("install", (event) => {
+  console.log("service worker installed");
 
-const activateEvent = () => {
-  self.addEventListener("activate", () => {
-    console.log("service worker activated");
-  });
-};
-activateEvent();
+  // Service Workerの更新があった場合に即座にactivateする
+  event.waitUntil(self.skipWaiting());
+});
+
+self.addEventListener("activate", (event) => {
+  console.log("service worker activated");
+
+  // 再読み込みを待たずにService Workerを有効にする
+  // https://developer.mozilla.org/ja/docs/Web/API/Clients/claim
+  event.waitUntil(clients.claim());
+});
 
 self.addEventListener("push", (event) => {
   if (!event.data) return;
