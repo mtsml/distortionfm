@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
-import { urlBase64ToUint8Array } from "@/util/utility";
+import {
+  getCurrentSubscriptionOrThrowError,
+  getNotificationPermissionOrThrowError,
+  subscribeWebPushOrThrowError
+} from "@/util/utility";
 
 const SubscribeIcon = () => {
   const [notificationIsGranted, setNotificationIsGranted] = useState(false);
@@ -10,39 +14,33 @@ const SubscribeIcon = () => {
   const [shakeIcon, setShakeIcon] = useState(false);
 
   useEffect(() => {
-    setNotificationIsGranted(Notification.permission === "granted");
-
     (async() => {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
-      setSubscribing(!!subscription);
+      try {
+        setNotificationIsGranted(Notification.permission === "granted");
+        setSubscribing(!!(await getCurrentSubscriptionOrThrowError()));
+      } catch(error) {
+        // マウント時はエラーメッセージを表示しない
+      }
     })();
   }, []);
 
   /**
-   * ユーザーに許可を求めてPush通知をSubscribe
+   * Push通知を購読する
    */
   const subscribeNotifications = async () => {
     try {
       // ユーザーからPush通知の許可を得る
-      const permission = await Notification.requestPermission();
+      const permission = await getNotificationPermissionOrThrowError();
       setNotificationIsGranted(permission === "granted");
 
-      if (permission === "denied") {
-        alert("通知設定が拒否されています。ブラウザの設定からがんばって拒否を解除してください。");
-      }
-
       if (permission === "granted") {
-        if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY === undefined) {
-          throw new Error("VAPID_PUBLIC_KEY is not found.");
-        }
-
         // Push通知をSubscribe
-        const registration = await navigator.serviceWorker.ready;
-        const subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY),
-        });
+        const subscription = await subscribeWebPushOrThrowError();
+        setSubscribing(true);
+
+        // アイコンを揺らしてスマホのバイブレーションを鳴らす
+        setShakeIcon(true)
+        navigator.vibrate(200);
 
         // APIにSubscribe情報を渡してDBへ保存する
         await fetch("/api/subscription", {
@@ -52,43 +50,38 @@ const SubscribeIcon = () => {
           },
           body: JSON.stringify({ subscription })
         });
-
-        setSubscribing(true);
-
-        // アイコンを揺らしてスマホのバイブレーションを鳴らす
-        setShakeIcon(true)
-        navigator.vibrate(200);
       }
-    } catch(e) {
-      console.log("error", e);
-      alert("深刻なエラーが発生しました。。。\nFaild to subscribe Notifications");
+    } catch (error) {
+      alert(error);
     }
   };
 
   /**
-   * Push通知を解除
+   * Push通知の購読を解除する
    */
   const unsubscribeNotifications = async () => {
     // TODO: 独自のconfirmを実装して分かりやすいメッセージとボタンに差し替える
     if (!confirm("通知を解除します。OK？")) return;
 
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.getSubscription();
-
-    if (subscription) {
-      await Promise.all([
-        subscription.unsubscribe(),
-        fetch("/api/subscription", {
-          method: "DELETE",
-          headers: {
-            "Content-type": "application/json"
-          },
-          body: JSON.stringify({ subscription })
-        })
-      ]);
+    try {
+      const subscription = await getCurrentSubscriptionOrThrowError(); 
+      setSubscribing(false);
+      if (subscription) {
+        // Subscribeを解除してDBから情報を削除する
+        await Promise.all([
+          subscription.unsubscribe(),
+          fetch("/api/subscription", {
+            method: "DELETE",
+            headers: {
+              "Content-type": "application/json"
+            },
+            body: JSON.stringify({ subscription })
+          })
+        ]);
+      }
+    } catch (error) {
+      alert(error);
     }
-
-    setSubscribing(false);
   };
 
   return (
