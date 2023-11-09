@@ -2,19 +2,17 @@ import { useEffect } from 'react';
 import Script from 'next/script';
 import type { AppProps } from 'next/app';
 import '@/styles/globals.css';
+import { regsterServiceWorkerOrThowError } from "@/util/utility"
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
 
 const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      try {
-        navigator.serviceWorker.register("/service-worker.js");
-      } catch (e) {
-        console.log("error", e);
-        alert("深刻なエラーが発生しました。。。\nFaild to register ServiceWorker");
-      }
+    try {
+      regsterServiceWorkerOrThowError()
+    } catch (error) {
+      alert(error);
     }
   }, []);
 

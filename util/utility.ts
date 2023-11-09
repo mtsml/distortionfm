@@ -42,7 +42,7 @@ export const getNotificationPermissionOrThrowError = async (): Promise<Notificat
 
   try {
     permission = await Notification.requestPermission();
-  } catch (error) {
+  } catch {
     throw new Error(MESSAGE_NOT_SUPPORT_NOTIFICATIONS);
   }
 
@@ -54,6 +54,18 @@ export const getNotificationPermissionOrThrowError = async (): Promise<Notificat
 }
 
 /**
+ * Service Workerを登録する
+ * Service Workerが利用できない場合は例外を投げる
+ */
+export const regsterServiceWorkerOrThowError = (): void => {
+  try {
+    navigator.serviceWorker.register("/service-worker.js");
+  } catch {
+    throw new Error(MESSAGE_NOT_SUPPORT_NOTIFICATIONS);
+  }
+}
+
+/**
  * 現在のPushSubscriptionを取得する
  * WebPushが利用できない場合は例外を投げる
  */
@@ -62,7 +74,7 @@ export const getCurrentSubscriptionOrThrowError = async (): Promise<PushSubscrip
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.getSubscription();
     return subscription;
-  } catch (error) {
+  } catch {
     throw new Error(MESSAGE_NOT_SUPPORT_WEB_PUSH);
   }
 }
@@ -84,7 +96,7 @@ export const subscribeWebPushOrThrowError = async (): Promise<PushSubscription> 
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
     });
     return subscription;
-  } catch (error) {
+  } catch {
     throw new Error(MESSAGE_NOT_SUPPORT_WEB_PUSH);
   }
 }
