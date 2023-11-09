@@ -139,6 +139,9 @@ p {
 
 .subscribe-icon.enabled {
   color: goldenrod;
+}
+
+.subscribe-icon.enabled.shake {
   animation: shake .5s linear 2;
 }
 

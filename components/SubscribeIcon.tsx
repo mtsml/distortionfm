@@ -6,7 +6,8 @@ import { urlBase64ToUint8Array } from "@/util/utility";
 
 const SubscribeIcon = () => {
   const [notificationIsGranted, setNotificationIsGranted] = useState(false);
-  const [subscribingNotifications, setSubscribingNotifications] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+  const [shakeIcon, setShakeIcon] = useState(false);
 
   useEffect(() => {
     setNotificationIsGranted(Notification.permission === "granted");
@@ -14,7 +15,7 @@ const SubscribeIcon = () => {
     (async() => {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
-      setSubscribingNotifications(!!subscription);
+      setSubscribing(!!subscription);
     })();
   }, []);
 
@@ -52,7 +53,10 @@ const SubscribeIcon = () => {
           body: JSON.stringify({ subscription })
         });
 
-        setSubscribingNotifications(true);
+        setSubscribing(true);
+
+        // アイコンを揺らしてスマホのバイブレーションを鳴らす
+        setShakeIcon(true)
         navigator.vibrate(200);
       }
     } catch(e) {
@@ -84,15 +88,18 @@ const SubscribeIcon = () => {
       ]);
     }
 
-    setSubscribingNotifications(false);
+    setSubscribing(false);
   };
 
   return (
     <FontAwesomeIcon
-      className={clsx("subscribe-icon", { enabled: notificationIsGranted && subscribingNotifications })}
+      className={clsx("subscribe-icon", {
+        enabled: notificationIsGranted && subscribing,
+        shake: shakeIcon
+      })}
       icon={faBell}
       size="xl"
-      onClick={notificationIsGranted && subscribingNotifications
+      onClick={notificationIsGranted && subscribing
         ? unsubscribeNotifications
         : subscribeNotifications
       }
