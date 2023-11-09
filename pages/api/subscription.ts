@@ -16,6 +16,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     await putMethod(req, res);
   } else if (req.method === "DELETE") {
     await deleteMethod(req, res);
+  } else if (req.method === "OPTIONS") {
+    await optionsMethod(res);
   } else {
     // Method Not Allowed
     res.status(405).end();
@@ -80,6 +82,10 @@ const deleteMethod = async (req: NextApiRequest, res: NextApiResponse) => {
   `;
 
   res.status(200).end();
+}
+
+const optionsMethod = async (res: NextApiResponse) => {
+  res.setHeader("Access-Control-Allow-Methods", "PUT,POST,DELETE,OPTIONS").status(200).end();
 }
 
 export default handler;
