@@ -40,7 +40,7 @@ const SubscribeIcon = () => {
 
         // アイコンを揺らしてスマホのバイブレーションを鳴らす
         setShakeIcon(true)
-        navigator.vibrate(200);
+        navigator.vibrate && navigator.vibrate(200);
 
         // APIにSubscribe情報を渡してDBへ保存する
         await fetch("/api/subscription", {
