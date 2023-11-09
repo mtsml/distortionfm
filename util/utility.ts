@@ -24,7 +24,9 @@ const MESSAGE_DENIED_NOTIFICATIONS = [
 ].join("\n");
 const MESSAGE_NOT_SUPPORT_NOTIFICATIONS = [
   MESSAGE_NOT_SUPPORT_WEB_PUSH,
-  "iPhoneまたはiPadをご利用の場合は次の手順で通知機能を利用できます。",
+  "",
+  "iPhoneまたはiPadは次の手順で通知機能を利用できます。",
+  "",
   "1. このサイトをSafariを開く",
   "2. 共有ボタンをクリック",
   "3. 「ホーム画面に追加」をクリック",
