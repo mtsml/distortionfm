@@ -12,7 +12,7 @@ const App = ({ Component, pageProps }: AppProps) => {
     try {
       regsterServiceWorkerOrThowError()
     } catch (error) {
-      alert(error);
+      // マウント時はエラーメッセージを表示しない
     }
   }, []);
 
