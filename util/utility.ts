@@ -20,7 +20,7 @@ export const toSimpleDateFormat = (dateString: string | undefined): string | und
 const MESSAGE_NOT_SUPPORT_WEB_PUSH = "このブラウザでは通知機能が利用できません。";
 const MESSAGE_DENIED_NOTIFICATIONS = [
   "通知設定が拒否されています。",
-  "ブラウザの設定からがんばって拒否を解除してください。"
+  "通知拒否を解除する方法をググってください。"
 ].join("\n");
 const MESSAGE_NOT_SUPPORT_NOTIFICATIONS = [
   MESSAGE_NOT_SUPPORT_WEB_PUSH,
@@ -95,23 +95,10 @@ export const subscribeWebPushOrThrowError = async (): Promise<PushSubscription> 
     const registration = await navigator.serviceWorker.ready;
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      applicationServerKey: vapidPublicKey
     });
     return subscription;
   } catch {
     throw new Error(MESSAGE_NOT_SUPPORT_WEB_PUSH);
   }
-}
-
-const urlBase64ToUint8Array = (base64String: string) => {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-
-  const outputArray = new Uint8Array(rawData.length);
-  for (var i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-
-  return outputArray;
 }
