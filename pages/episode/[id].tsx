@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
+import Link from "next/link";
 import Head from "next/head";
 import Parser from "rss-parser";
 import clsx from "clsx";
@@ -128,20 +129,29 @@ const Episode = ({ episode }: Props) => {
                 controls
               ></audio>
             </div>
-            <div className="speaker-wrapper">
-              {episode.speakers.map(speaker => (
-                <span className="speaker">
-                  <FontAwesomeIcon
+            <div className="pure-menu-horizontal speaker-wrapper">
+              <ul className="pure-menu-list">
+                {episode.speakers.map(speaker => (
+                  <li
                     key={speaker.id}
-                    className="speaker-icon"
-                    icon={speaker.icon}
-                    size="sm"
-                  />
-                  <span className="speaker-name">
-                    {speaker.name}
-                  </span>
-                </span>
-              ))}
+                    className="pure-menu-item"
+                  >
+                    <Link
+                      className="speaker pure-menu-link"
+                      href={`/speaker/${encodeURIComponent(speaker.id)}`}
+                    >
+                      <FontAwesomeIcon
+                        className="speaker-icon"
+                        icon={speaker.icon}
+                        size="sm"
+                      />
+                      <span className="speaker-name">
+                        {speaker.name}
+                      </span>
+                    </Link>                    
+                  </li>
+                ))}
+              </ul>
             </div>
             <div>
               <a
