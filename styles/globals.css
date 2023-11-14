@@ -165,10 +165,9 @@ p {
   display: flex;
 }
 
-.speaker-wrapper {
-  margin-left: 0.5em;
-  margin-right: 0.5em;
-  margin-bottom: 1em;
+.speaker {
+  display: inline-block;
+  padding: 0;
 }
 
 .speaker-icon {
@@ -178,4 +177,9 @@ p {
 
 .speaker-name {
   padding-right: 1em;
+}
+
+.description-meta {
+  display: flex;
+  justify-content: space-between;
 }

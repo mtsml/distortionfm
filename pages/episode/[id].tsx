@@ -129,30 +129,6 @@ const Episode = ({ episode }: Props) => {
                 controls
               ></audio>
             </div>
-            <div className="pure-menu-horizontal speaker-wrapper">
-              <ul className="pure-menu-list">
-                {episode.speakers.map(speaker => (
-                  <li
-                    key={speaker.id}
-                    className="pure-menu-item"
-                  >
-                    <Link
-                      className="speaker pure-menu-link"
-                      href={`/speaker/${encodeURIComponent(speaker.id)}`}
-                    >
-                      <FontAwesomeIcon
-                        className="speaker-icon"
-                        icon={speaker.icon}
-                        size="sm"
-                      />
-                      <span className="speaker-name">
-                        {speaker.name}
-                      </span>
-                    </Link>                    
-                  </li>
-                ))}
-              </ul>
-            </div>
             <div>
               <a
                 className={clsx("tab", { active: activeTabIdx === 0})}
@@ -173,7 +149,28 @@ const Episode = ({ episode }: Props) => {
               id="descriptionWrapper"
               style={{ display: activeTabIdx === 0 ? "block" : "none" }}
             >
-              <p>{episode.date}</p>
+              <p className="description-meta">
+                <span>
+                  {episode.date}
+                </span>
+                <span>
+                  {episode.speakers.map(speaker => (
+                    <Link
+                      className="speaker pure-menu-link"
+                      href={`/speaker/${encodeURIComponent(speaker.id)}`}
+                    >
+                      <FontAwesomeIcon
+                        className="speaker-icon"
+                        icon={speaker.icon}
+                        size="sm"
+                      />
+                      <span className="speaker-name">
+                        {speaker.name}
+                      </span>
+                    </Link>
+                  ))}
+                </span>
+              </p>
             </div>
             <div
               id="transcriptWrapper"
