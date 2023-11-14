@@ -22,17 +22,6 @@ const MESSAGE_DENIED_NOTIFICATIONS = [
   "通知設定が拒否されています。",
   "通知拒否を解除する方法をググってください。"
 ].join("\n");
-const MESSAGE_NOT_SUPPORT_NOTIFICATIONS = [
-  MESSAGE_NOT_SUPPORT_WEB_PUSH,
-  "",
-  "iPhoneまたはiPadは次の手順で通知機能を利用できます。",
-  "",
-  "1. このサイトをSafariを開く",
-  "2. 共有ボタンをクリック",
-  "3. 「ホーム画面に追加」をクリック",
-  "4. ホーム画面に追加されたアプリを開く",
-  "5. アプリ上で通知ボタンをクリック"
-].join("\n");
 const MESSAGE_VAPID_PUBLIC_KEY_IS_NOT_FOUND = "VAPID_PUBLIC_KEY is not found.";
 
 /**
@@ -45,7 +34,7 @@ export const getNotificationPermissionOrThrowError = async (): Promise<Notificat
   try {
     permission = await Notification.requestPermission();
   } catch {
-    throw new Error(MESSAGE_NOT_SUPPORT_NOTIFICATIONS);
+    throw new Error(MESSAGE_NOT_SUPPORT_WEB_PUSH);
   }
 
   if (permission === "denied") {
@@ -63,7 +52,7 @@ export const regsterServiceWorkerOrThowError = (): void => {
   try {
     navigator.serviceWorker.register("/service-worker.js");
   } catch {
-    throw new Error(MESSAGE_NOT_SUPPORT_NOTIFICATIONS);
+    throw new Error(MESSAGE_NOT_SUPPORT_WEB_PUSH);
   }
 }
 

@@ -25,16 +25,16 @@ const SubscribeIcon = () => {
   }, []);
 
   /**
-   * Push通知を購読する
+   * プッシュ通知を購読する
    */
   const subscribeNotifications = async () => {
     try {
-      // ユーザーからPush通知の許可を得る
+      // ユーザーから通知許可を得る
       const permission = await getNotificationPermissionOrThrowError();
       setNotificationIsGranted(permission === "granted");
 
       if (permission === "granted") {
-        // Push通知をSubscribe
+        // プッシュ通知をSubscribe
         const subscription = await subscribeWebPushOrThrowError();
         setSubscribing(true);
 
@@ -56,7 +56,7 @@ const SubscribeIcon = () => {
   };
 
   /**
-   * Push通知の購読を解除する
+   * プッシュ通知の購読を解除する
    */
   const unsubscribeNotifications = async () => {
     // TODO: 独自のconfirmを実装して分かりやすいメッセージとボタンに差し替える

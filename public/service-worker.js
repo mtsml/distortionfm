@@ -1,13 +1,9 @@
 self.addEventListener("install", (event) => {
-  console.log("service worker installed");
-
   // Service Workerの更新があった場合に即座にactivateする
   event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener("activate", (event) => {
-  console.log("service worker activated");
-
   // 再読み込みを待たずにService Workerを有効にする
   // https://developer.mozilla.org/ja/docs/Web/API/Clients/claim
   event.waitUntil(clients.claim());
