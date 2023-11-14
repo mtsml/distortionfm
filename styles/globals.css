@@ -160,3 +160,12 @@ p {
     transform-origin: center top;
   }
 }
+
+#episodes .pure-menu-item {
+  display: flex;
+}
+
+.speaker-icon {
+  align-self: center;
+  padding: 0.2em;
+}
