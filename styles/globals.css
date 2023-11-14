@@ -165,7 +165,19 @@ p {
   display: flex;
 }
 
+.speaker-wrapper {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  margin-bottom: 1em;
+}
+
 .speaker-icon {
   align-self: center;
-  padding: 0.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
+.speaker-name {
+  padding: 0.5em;
+  padding-right: 1em;
 }

@@ -4,9 +4,17 @@ import Head from "next/head";
 import Parser from "rss-parser";
 import clsx from "clsx";
 import { sql } from "@vercel/postgres";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getIdFromAnchorRssFeedItem, toSimpleDateFormat } from "@/util/utility";
+
+interface Speaker {
+  id: number;
+  name: string;
+  icon: IconProp;
+}
 
 interface Transcript {
   transcript: string;
@@ -18,6 +26,7 @@ interface Episode {
   id: string;
   title: string;
   date: string;
+  speakers: Speaker[];
   enclosure: Parser.Enclosure;
   description: string;
   transcripts: Transcript[];
@@ -119,6 +128,21 @@ const Episode = ({ episode }: Props) => {
                 controls
               ></audio>
             </div>
+            <div className="speaker-wrapper">
+              {episode.speakers.map(speaker => (
+                <span className="speaker">
+                  <FontAwesomeIcon
+                    key={speaker.id}
+                    className="speaker-icon"
+                    icon={speaker.icon}
+                    size="sm"
+                  />
+                  <span className="speaker-name">
+                    {speaker.name}
+                  </span>
+                </span>
+              ))}
+            </div>
             <div>
               <a
                 className={clsx("tab", { active: activeTabIdx === 0})}
@@ -196,13 +220,22 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (!episode) return  { props: { episode: {} } }
   const { title , isoDate, content, enclosure } = episode;
 
-  // DB
-  const { rows } = await sql`
+  // transcript info from DB
+  const transcripts = (await sql`
     SELECT transcript, start_ms AS "startMs", end_ms AS "endMs"
     FROM vtt
     WHERE id = ${id}
     ORDER BY start_ms
-  `;
+  `).rows;
+
+  // episode info from DB
+  const speakers = (await sql`
+    SELECT speaker.id, name, icon
+    FROM episode_speaker_map esm
+    INNER JOIN speaker ON speaker.id = esm.speaker_id
+    WHERE episode_id = ${id}
+    ORDER BY speaker.id
+  `).rows;
 
   return {
     props: {
@@ -210,9 +243,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
         id,
         title,
         date: toSimpleDateFormat(isoDate),
+        speakers,
         enclosure,
         description: content,
-        transcripts: rows || []
+        transcripts: transcripts || []
       }
     }
   }
