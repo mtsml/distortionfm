@@ -172,11 +172,19 @@ p {
 
 .speaker-icon {
   align-self: center;
-  padding-right: 0.2em;
+  margin-right: 0.2em;
+  width: 40px;
+  border: 3px solid #767676;
+  border-radius: 100%;
 }
 
 .speaker-name {
   padding-right: 1em;
+}
+
+.speaker-description {
+  padding-left: 1em;
+  vertical-align: top;
 }
 
 .description-meta {

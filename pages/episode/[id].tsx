@@ -5,16 +5,16 @@ import Head from "next/head";
 import Parser from "rss-parser";
 import clsx from "clsx";
 import { sql } from "@vercel/postgres";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SpeakerIcon from "@/components/SpeakerIcon";
 import { getIdFromAnchorRssFeedItem, toSimpleDateFormat } from "@/util/utility";
 
 interface Speaker {
   id: number;
   name: string;
-  icon: IconProp;
+  icon: string;
+  color: string;
 }
 
 interface Transcript {
@@ -159,10 +159,10 @@ const Episode = ({ episode }: Props) => {
                       className="speaker pure-menu-link"
                       href={`/speaker/${encodeURIComponent(speaker.id)}`}
                     >
-                      <FontAwesomeIcon
-                        className="speaker-icon"
+                      <SpeakerIcon
+                        id={speaker.id}
                         icon={speaker.icon}
-                        size="sm"
+                        color={speaker.color}
                       />
                       <span className="speaker-name">
                         {speaker.name}
@@ -237,7 +237,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   // episode info from DB
   const speakers = (await sql`
-    SELECT speaker.id, name, icon
+    SELECT speaker.id, name, encode(icon, 'base64') as icon, color
     FROM episode_speaker_map esm
     INNER JOIN speaker ON speaker.id = esm.speaker_id
     WHERE episode_id = ${id}

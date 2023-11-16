@@ -2,16 +2,16 @@ import { GetStaticProps } from "next";
 import Link from "next/link";
 import Parser from "rss-parser";
 import { sql } from "@vercel/postgres";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SpeakerIcon from "@/components/SpeakerIcon";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
 
 interface Speaker {
   id: number;
   name: string;
-  icon: IconProp;
+  icon: string;
+  color: string;
 }
 
 interface Episode {
@@ -39,11 +39,10 @@ const Home = ({ episodes }: Props) => {
                   {episode.title}
                 </Link>
                 {episode.speakers.map(speaker => (
-                  <FontAwesomeIcon
-                    key={speaker.id}
-                    className="speaker-icon"
+                  <SpeakerIcon
+                    id={speaker.id}
                     icon={speaker.icon}
-                    size="sm"
+                    color={speaker.color}
                   />
                 ))}
               </div>
@@ -61,7 +60,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
   const { rows } = await sql`
-    SELECT episode_id, speaker_id as id, name, icon
+    SELECT episode_id, speaker_id as id, name, encode(icon, 'base64') as icon, color
     FROM episode_speaker_map esm
     INNER JOIN speaker ON speaker.id = esm.speaker_id
     ORDER BY episode_id, speaker_id
