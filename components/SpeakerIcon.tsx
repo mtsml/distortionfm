@@ -1,20 +1,24 @@
 import Link from "next/link";
 
-interface SpeakrIconProp {
-  icon: string;
-  color: string;
+interface SpeakrIconProps {
   id: number;
+  icon: string;
+  name?: string;
 }
 
-const SpeakrIcon = ({ icon, color, id }: SpeakrIconProp) => {
+const SpeakrIcon = ({ id, icon, name }: SpeakrIconProps) => {
   return (
     <Link
       className="speaker pure-menu-link"
       href={`/speaker/${encodeURIComponent(id)}`}
     >
+      {name &&
+        <span>
+          {name}
+        </span>
+      }
       <img
         className="speaker-icon"
-        style={{ borderColor: color }}
         src={`data:image/png;base64,${icon}`}
       />
     </Link>

@@ -5,7 +5,6 @@ import Parser from "rss-parser";
 import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import SpeakerIcon from "@/components/SpeakerIcon";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
 
 interface Speaker {
@@ -13,14 +12,12 @@ interface Speaker {
   name: string;
   icon: string;
   description: string | null;
-  color: string;
 }
 
 interface Episode {
   id: string;
   title: string;
   isoDate: string;
-  speakers: Speaker[];
 }
 
 interface Props {
@@ -52,13 +49,6 @@ const Speaker = ({ episodes, speaker }: Props) => {
                   <Link href={`/episode/${encodeURIComponent(episode.id)}`} className="pure-menu-link">
                     {episode.title}
                   </Link>
-                  {episode.speakers.map(speaker => (
-                    <SpeakerIcon
-                      id={speaker.id}
-                      icon={speaker.icon}
-                      color={speaker.color}
-                    />
-                  ))}
                 </div>
               ))}
             </div>
@@ -96,30 +86,31 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const parser = new Parser();
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
-  const { rows } = await sql`
-    SELECT episode_id, speaker_id as id, name, encode(icon, 'base64') as icon, description, color
-    FROM episode_speaker_map esm
-    INNER JOIN speaker ON speaker.id = esm.speaker_id
-    ORDER BY episode_id, speaker_id
-  `;
+  const episodeIds = (await sql`
+    SELECT episode_id
+    FROM episode_speaker_map
+    WHERE speaker_id = ${speakerId}
+  `).rows.map(row => row.episode_id);
 
   const episodes = feed.items
     .map(item => {
       const id = getIdFromAnchorRssFeedItem(item);
       const title = item.title;
       const isoDate = item.isoDate;
-      const speakers = rows.filter(row => row.episode_id === id);
 
       return {
         id,
         title,
         isoDate,
-        speakers
       }
     })
-    .filter(episode => episode.speakers.some(speaker => speaker.id === speakerId));
+    .filter(episode => episodeIds.includes(episode.id));
 
-  const speaker = rows.find(row => row.id === speakerId);
+  const speaker = (await sql`
+    SELECT id, name, encode(icon, 'base64') as icon, description
+    FROM speaker
+    WHERE id = ${speakerId}
+  `).rows[0];
 
   return {
     props: {

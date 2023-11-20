@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { GetStaticPaths, GetStaticProps } from "next";
-import Link from "next/link";
 import Head from "next/head";
 import Parser from "rss-parser";
 import clsx from "clsx";
@@ -12,9 +11,8 @@ import { getIdFromAnchorRssFeedItem, toSimpleDateFormat } from "@/util/utility";
 
 interface Speaker {
   id: number;
-  name: string;
   icon: string;
-  color: string;
+  name: string;
 }
 
 interface Transcript {
@@ -27,7 +25,7 @@ interface Episode {
   id: string;
   title: string;
   date: string;
-  speakers: Speaker[];
+  guests: Speaker[];
   enclosure: Parser.Enclosure;
   description: string;
   transcripts: Transcript[];
@@ -153,23 +151,19 @@ const Episode = ({ episode }: Props) => {
                 <span>
                   {episode.date}
                 </span>
-                <span>
-                  {episode.speakers.map(speaker => (
-                    <Link
-                      className="speaker pure-menu-link"
-                      href={`/speaker/${encodeURIComponent(speaker.id)}`}
-                    >
+                {episode.guests.length !== 0 &&
+                  <span>
+                    <span className="guest-label">Guest:</span>
+                    {episode.guests.map(guest => (
                       <SpeakerIcon
-                        id={speaker.id}
-                        icon={speaker.icon}
-                        color={speaker.color}
+                        key={guest.id}
+                        id={guest.id}
+                        icon={guest.icon}
+                        name={guest.name}
                       />
-                      <span className="speaker-name">
-                        {speaker.name}
-                      </span>
-                    </Link>
-                  ))}
-                </span>
+                    ))}
+                  </span>
+                }
               </p>
             </div>
             <div
@@ -236,12 +230,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
   `).rows;
 
   // episode info from DB
-  const speakers = (await sql`
-    SELECT speaker.id, name, encode(icon, 'base64') as icon, color
+  const guests = (await sql`
+    SELECT speaker.id, name, encode(icon, 'base64') as icon
     FROM episode_speaker_map esm
     INNER JOIN speaker ON speaker.id = esm.speaker_id
-    WHERE episode_id = ${id}
-    ORDER BY speaker.id
+    WHERE episode_id = ${id} AND speaker_id <> 0
   `).rows;
 
   return {
@@ -250,7 +243,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         id,
         title,
         date: toSimpleDateFormat(isoDate),
-        speakers,
+        guests,
         enclosure,
         description: content,
         transcripts: transcripts || []

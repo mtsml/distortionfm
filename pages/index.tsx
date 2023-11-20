@@ -11,14 +11,13 @@ interface Speaker {
   id: number;
   name: string;
   icon: string;
-  color: string;
 }
 
 interface Episode {
   id: string;
   title: string;
   isoDate: string;
-  speakers: Speaker[];
+  guests: Speaker[];
 }
 
 interface Props {
@@ -38,11 +37,11 @@ const Home = ({ episodes }: Props) => {
                 <Link href={`/episode/${encodeURIComponent(episode.id)}`} className="pure-menu-link">
                   {episode.title}
                 </Link>
-                {episode.speakers.map(speaker => (
+                {episode.guests.map(guest => (
                   <SpeakerIcon
-                    id={speaker.id}
-                    icon={speaker.icon}
-                    color={speaker.color}
+                    key={guest.id}
+                    id={guest.id}
+                    icon={guest.icon}
                   />
                 ))}
               </div>
@@ -60,9 +59,9 @@ export const getStaticProps: GetStaticProps = async () => {
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
   const { rows } = await sql`
-    SELECT episode_id, speaker_id as id, name, encode(icon, 'base64') as icon, color
+    SELECT episode_id, speaker_id as id, name, encode(icon, 'base64') as icon
     FROM episode_speaker_map esm
-    INNER JOIN speaker ON speaker.id = esm.speaker_id
+    INNER JOIN speaker ON speaker.id = esm.speaker_id AND esm.speaker_id <> 0
     ORDER BY episode_id, speaker_id
   `;
 
@@ -70,13 +69,13 @@ export const getStaticProps: GetStaticProps = async () => {
     const id = getIdFromAnchorRssFeedItem(item);
     const title = item.title;
     const isoDate = item.isoDate;
-    const speakers = rows.filter(row => row.episode_id === id);
+    const guests = rows.filter(row => row.episode_id === id);
 
     return {
       id,
       title,
       isoDate,
-      speakers
+      guests
     }
   });
 
