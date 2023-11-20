@@ -39,7 +39,7 @@ const Speaker = ({ episodes, speaker }: Props) => {
               {speaker.name}
             </h2>
             <p>
-              <img src={`data:image/png;base64,${speaker.icon}`}/>
+              <img className="speaker-icon -lg" src={`data:image/png;base64,${speaker.icon}`}/>
               {speaker.description && <span className="speaker-description">{speaker.description}</span>}
             </p>
             <h2>Episodes</h2>

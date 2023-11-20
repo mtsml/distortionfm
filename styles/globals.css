@@ -50,17 +50,16 @@ ul {
   margin-block-start: 0em;
   margin-block-end: 0em;
   padding-inline-start: 0px;
-  padding-left: 1em;
+  padding-left: 0em;
 }
 
 li {
-  width: fit-content;
   list-style: none;
 }
 
-li .pure-menu-link {
-  padding-left: 0;
-  padding-right: 0;
+.pure-menu-link {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
 }
 
 p {
@@ -173,6 +172,11 @@ p {
   margin-right: 0.2em;
   width: 30px;
   border-radius: 100%;
+}
+
+.speaker-icon.-lg {
+  width: 96px;
+  border-radius: 5%;
 }
 
 .speaker-description {
