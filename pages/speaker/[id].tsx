@@ -1,10 +1,10 @@
 import { GetStaticPaths, GetStaticProps } from "next";
-import Link from "next/link";
 import Head from "next/head";
 import Parser from "rss-parser";
 import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import EpisodeList from "@/components/EpisodeList";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
 
 interface Speaker {
@@ -43,15 +43,9 @@ const Speaker = ({ episodes, speaker }: Props) => {
               {speaker.description && <span className="speaker-description">{speaker.description}</span>}
             </p>
             <h2>Episodes</h2>
-            <div id="episodes" className="pure-menu">
-              {episodes.map(episode => (
-                <div key={episode.id} className="pure-menu-item">
-                  <Link href={`/episode/${encodeURIComponent(episode.id)}`} className="pure-menu-link">
-                    {episode.title}
-                  </Link>
-                </div>
-              ))}
-            </div>
+            <EpisodeList
+              episodes={episodes}
+            />
           </main>
           <Footer />
         </div>
