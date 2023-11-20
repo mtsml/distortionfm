@@ -5,27 +5,16 @@ import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EpisodeList from "@/components/EpisodeList";
+import Episode from "@/types/episode";
+import Speaker from "@/types/speaker";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
 
-interface Speaker {
-  id: number;
-  name: string;
-  icon: string;
-  description: string | null;
-}
-
-interface Episode {
-  id: string;
-  title: string;
-  isoDate: string;
-}
-
-interface Props {
+interface SpeakerPageProps {
   episodes: Episode[];
   speaker: Speaker;
 } 
 
-const Speaker = ({ episodes, speaker }: Props) => {
+const SpeakerPage = ({ episodes, speaker }: SpeakerPageProps) => {
   return (
     <>
       <Head>
@@ -114,4 +103,4 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 }
 
-export default Speaker;
+export default SpeakerPage;

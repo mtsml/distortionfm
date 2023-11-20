@@ -1,18 +1,6 @@
 import Link from "next/link";
 import SpeakerIcon from "@/components/SpeakerIcon";
-
-interface Speaker {
-  id: number;
-  name: string;
-  icon: string;
-}
-
-interface Episode {
-  id: string;
-  title: string;
-  isoDate: string;
-  guests?: Speaker[];
-}
+import Episode from "@/types/episode";
 
 interface EpisodeListProps {
   episodes: Episode[];

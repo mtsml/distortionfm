@@ -4,26 +4,14 @@ import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EpisodeList from "@/components/EpisodeList";
+import Episode from "@/types/episode";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
 
-interface Speaker {
-  id: number;
-  name: string;
-  icon: string;
-}
-
-interface Episode {
-  id: string;
-  title: string;
-  isoDate: string;
-  guests: Speaker[];
-}
-
-interface Props {
+interface HomeProps {
   episodes: Episode[];
 } 
 
-const Home = ({ episodes }: Props) => {
+const Home = ({ episodes }: HomeProps) => {
   return (
     <div className="pure-g">
       <Header />

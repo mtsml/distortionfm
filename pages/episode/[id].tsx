@@ -7,35 +7,21 @@ import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SpeakerIcon from "@/components/SpeakerIcon";
+import Episode from "@/types/episode";
+import Transcript from "@/types/transcript";
 import { getIdFromAnchorRssFeedItem, toSimpleDateFormat } from "@/util/utility";
 
-interface Speaker {
-  id: number;
-  icon: string;
-  name: string;
-}
-
-interface Transcript {
-  transcript: string;
-  startMs: number;
-  endMs: number;
-}
-
-interface Episode {
-  id: string;
-  title: string;
-  date: string;
-  guests: Speaker[];
+interface EpisodeWithDetail extends Episode {
   enclosure: Parser.Enclosure;
   description: string;
   transcripts: Transcript[];
 }
 
-interface Props {
-  episode: Episode;
+interface EpisodePageProps {
+  episode: EpisodeWithDetail;
 }
 
-const Episode = ({ episode }: Props) => {
+const EpisodePage = ({ episode }: EpisodePageProps) => {
   const [activeTabIdx, setActiveTabIdx] = useState<number>(0);
   const [activeTranscriptMs, setActiveTranscriptMs] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -151,7 +137,7 @@ const Episode = ({ episode }: Props) => {
                 <span>
                   {episode.date}
                 </span>
-                {episode.guests.length !== 0 &&
+                {episode.guests && episode.guests?.length !== 0 &&
                   <span>
                     <span className="guest-label">Guest:</span>
                     {episode.guests.map(guest => (
@@ -252,4 +238,4 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 }
 
-export default Episode;
+export default EpisodePage;
