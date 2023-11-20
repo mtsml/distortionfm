@@ -23,9 +23,8 @@ header {
   padding: 1em 1em 0 1em;
 }
 
-a:hover,
-a:focus {
-  text-decoration: underline;
+.pure-menu-link:hover {
+  background-color: inherit;
 }
 
 header a {
