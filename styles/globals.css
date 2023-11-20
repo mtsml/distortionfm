@@ -174,16 +174,6 @@ p {
   border-radius: 100%;
 }
 
-.speaker-icon.-lg {
-  width: 96px;
-  border-radius: 5%;
-}
-
-.speaker-description {
-  padding-left: 1em;
-  vertical-align: top;
-}
-
 .description-meta {
   display: flex;
   justify-content: space-between;
@@ -192,4 +182,24 @@ p {
 
 .guest-label {
   padding-right: 0.5em;
+}
+
+.profile {
+  display: flex;
+  margin-bottom: 1.2em;
+}
+
+.profile .speaker-icon {
+  width: 96px;
+  border-radius: 5%;
+  margin-right: 1em;
+}
+
+.profile .speaker-name {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+
+.profile .speaker-description {
+  vertical-align: top;
 }

@@ -25,12 +25,15 @@ const SpeakerPage = ({ episodes, speaker }: SpeakerPageProps) => {
         <div className="contents pure-u-1 pure-u-xl-3-4">
           <main>
             <h2>
-              {speaker.name}
+              Profile
             </h2>
-            <p>
-              <img className="speaker-icon -lg" src={`data:image/png;base64,${speaker.icon}`}/>
-              {speaker.description && <span className="speaker-description">{speaker.description}</span>}
-            </p>
+            <div className="profile">
+              <img className="speaker-icon" src={`data:image/png;base64,${speaker.icon}`}/>
+              <div>
+                <h3 className="speaker-name">{speaker.name}</h3>
+                {speaker.description && <span className="speaker-description">{speaker.description}</span>}
+              </div>
+            </div>
             <h2>Episodes</h2>
             <EpisodeList
               episodes={episodes}
