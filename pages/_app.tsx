@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import Script from "next/script";
 import type { AppProps } from "next/app";
-import "@/styles/globals.css";
-import { regsterServiceWorkerOrThowError } from "@/util/utility"
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { regsterServiceWorkerOrThowError } from "@/util/utility";
+import "@/styles/globals.css";
+
+// FontAwesome Settings
 config.autoAddCss = false;
 
 const App = ({ Component, pageProps }: AppProps) => {

@@ -6,28 +6,22 @@ import clsx from "clsx";
 import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SpeakerIcon from "@/components/SpeakerIcon";
+import Episode from "@/types/episode";
+import Transcript from "@/types/transcript";
 import { getIdFromAnchorRssFeedItem, toSimpleDateFormat } from "@/util/utility";
 
-interface Transcript {
-  transcript: string;
-  startMs: number;
-  endMs: number;
-}
-
-interface Episode {
-  id: string;
-  title: string;
-  date: string;
+interface EpisodeWithDetail extends Episode {
   enclosure: Parser.Enclosure;
   description: string;
   transcripts: Transcript[];
 }
 
-interface Props {
-  episode: Episode;
+interface EpisodePageProps {
+  episode: EpisodeWithDetail;
 }
 
-const Episode = ({ episode }: Props) => {
+const EpisodePage = ({ episode }: EpisodePageProps) => {
   const [activeTabIdx, setActiveTabIdx] = useState<number>(0);
   const [activeTranscriptMs, setActiveTranscriptMs] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -139,7 +133,24 @@ const Episode = ({ episode }: Props) => {
               id="descriptionWrapper"
               style={{ display: activeTabIdx === 0 ? "block" : "none" }}
             >
-              <p>{episode.date}</p>
+              <p className="description-meta">
+                <span>
+                  {episode.date}
+                </span>
+                {episode.guests && episode.guests?.length !== 0 &&
+                  <span>
+                    <span className="guest-label">Guest:</span>
+                    {episode.guests.map(guest => (
+                      <SpeakerIcon
+                        key={guest.id}
+                        id={guest.id}
+                        icon={guest.icon}
+                        name={guest.name}
+                      />
+                    ))}
+                  </span>
+                }
+              </p>
             </div>
             <div
               id="transcriptWrapper"
@@ -196,13 +207,21 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (!episode) return  { props: { episode: {} } }
   const { title , isoDate, content, enclosure } = episode;
 
-  // DB
-  const { rows } = await sql`
+  // transcript info from DB
+  const transcripts = (await sql`
     SELECT transcript, start_ms AS "startMs", end_ms AS "endMs"
     FROM vtt
     WHERE id = ${id}
     ORDER BY start_ms
-  `;
+  `).rows;
+
+  // episode info from DB
+  const guests = (await sql`
+    SELECT speaker.id, name, encode(icon, 'base64') as icon
+    FROM episode_speaker_map esm
+    INNER JOIN speaker ON speaker.id = esm.speaker_id
+    WHERE episode_id = ${id} AND speaker_id <> 0
+  `).rows;
 
   return {
     props: {
@@ -210,12 +229,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
         id,
         title,
         date: toSimpleDateFormat(isoDate),
+        guests,
         enclosure,
         description: content,
-        transcripts: rows || []
+        transcripts: transcripts || []
       }
     }
   }
 }
 
-export default Episode;
+export default EpisodePage;
