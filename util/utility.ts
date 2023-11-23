@@ -10,6 +10,17 @@ export const getIdFromAnchorRssFeedItem = (item: Parser.Item): string => {
   return id;
 }
 
+export const achorRssFeedItemsToEpisodes = (items: Parser.Item[]) => {
+  return items.map(item => ({
+    id: getIdFromAnchorRssFeedItem(item),
+    title: item.title,
+    date: toSimpleDateFormat(item.isoDate),
+    link: item.link,
+    content: item.content,
+    enclosure: item.enclosure
+  }));
+}
+
 /**
  * 日時を表す文字列をyyyy/MM/ddに変換する
  */

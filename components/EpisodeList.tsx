@@ -11,7 +11,10 @@ const EpisodeList = ({ episodes }: EpisodeListProps) => {
     <div id="episodes" className="pure-menu">
       {episodes.map(episode => (
         <div key={episode.id} className="pure-menu-item">
-          <Link href={`/episode/${encodeURIComponent(episode.id)}`} className="pure-menu-link">
+          <Link
+            className="pure-menu-link"
+            href={`/episode/${encodeURIComponent(episode.id)}`}
+          >
             {episode.title}
           </Link>
           {episode.guests?.map(guest => (

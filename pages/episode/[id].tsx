@@ -3,13 +3,11 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Parser from "rss-parser";
 import clsx from "clsx";
-import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SpeakerIcon from "@/components/SpeakerIcon";
 import Episode from "@/types/episode";
 import Transcript from "@/types/transcript";
-import { getIdFromAnchorRssFeedItem, toSimpleDateFormat } from "@/util/utility";
 
 interface EpisodeWithDetail extends Episode {
   enclosure: Parser.Enclosure;
@@ -177,15 +175,16 @@ const EpisodePage = ({ episode }: EpisodePageProps) => {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const parser = new Parser();
-  const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/episodes`);
+  const { episodes } = await response.json();
 
-  const paths = feed.items.map(item => {
-    const id = getIdFromAnchorRssFeedItem(item);
-    return {
-      params: { id }
+  const paths = episodes.map((episode: Episode) => (
+    {
+      params: {
+        id: String(episode.id)
+      }
     }
-  });
+  ));
 
   return {
     paths,
@@ -196,44 +195,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async (context) => {
   const id = context.params ? context.params.id as string : "";
 
-  // RSS
-  const parser = new Parser({
-    customFields: {
-      item: ["enclosure"]
-    }
-  });
-  const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
-  const episode = feed.items.find(item => item.link?.includes(id));
-  if (!episode) return  { props: { episode: {} } }
-  const { title , isoDate, content, enclosure } = episode;
-
-  // transcript info from DB
-  const transcripts = (await sql`
-    SELECT transcript, start_ms AS "startMs", end_ms AS "endMs"
-    FROM vtt
-    WHERE id = ${id}
-    ORDER BY start_ms
-  `).rows;
-
-  // episode info from DB
-  const guests = (await sql`
-    SELECT speaker.id, name, encode(icon, 'base64') as icon
-    FROM episode_speaker_map esm
-    INNER JOIN speaker ON speaker.id = esm.speaker_id
-    WHERE episode_id = ${id} AND speaker_id <> 0
-  `).rows;
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/episodes/${id}`);
+  const { episode } = await response.json();
 
   return {
     props: {
-      episode: {
-        id,
-        title,
-        date: toSimpleDateFormat(isoDate),
-        guests,
-        enclosure,
-        description: content,
-        transcripts: transcripts || []
-      }
+      episode
     }
   }
 }
