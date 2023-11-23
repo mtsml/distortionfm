@@ -23,7 +23,7 @@ const getMethod = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (rows.length === 0) {
     // Not Found
-    res.status(404).json({ speaker: {} });
+    res.status(200).json({ speaker: {} });
     return;
   }
   res.status(200).json({ speaker: rows[0] });
