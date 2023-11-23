@@ -1,6 +1,6 @@
 import Parser from "rss-parser";
 
-export const getIdFromAnchorRssFeedItem = (item: Parser.Item): string => {
+const getIdFromAnchorRssFeedItem = (item: Parser.Item): string => {
   let id = "";
   // 正規表現でURL内のIDを取得
   if (item.link) {

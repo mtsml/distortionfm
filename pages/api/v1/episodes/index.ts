@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Parser from "rss-parser";
 import { sql } from "@vercel/postgres";
-import { getIdFromAnchorRssFeedItem } from "@/util/utility";
+import { achorRssFeedItemsToEpisodes } from "@/util/utility";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
@@ -34,19 +34,10 @@ const getMethod = async (res: NextApiResponse) => {
       speaker_id
   `;
 
-  const episodes = feed.items.map(item => {
-    const id = getIdFromAnchorRssFeedItem(item);
-    const title = item.title;
-    const date = item.isoDate;
-    const guests = rows.filter(row => row.episode_id === id);
-
-    return {
-      id,
-      title,
-      date,
-      guests
-    }
-  });
+  const episodes = achorRssFeedItemsToEpisodes(feed.items).map(item => ({
+    ...item,
+    guests: rows.filter(row => row.episode_id === item.id)
+  }));
 
   res.status(200).json({ episodes });
 }

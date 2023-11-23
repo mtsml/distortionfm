@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import Parser from "rss-parser";
 import { sql } from "@vercel/postgres";
-import { achorRssFeedItemsToEpisodes, toSimpleDateFormat } from "@/util/utility";
+import { achorRssFeedItemsToEpisodes } from "@/util/utility";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "GET") {
