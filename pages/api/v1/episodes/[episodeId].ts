@@ -28,7 +28,7 @@ const getMethod = async (req: NextApiRequest, res: NextApiResponse) => {
   const episode = episodes.find(item => item.link?.includes(episodeId));
   if (!episode) {
     // Not Found
-    res.status(404).end();
+    res.status(404).json({ episode: {} });
     return;
   }
   const { title , date, content, enclosure } = episode;

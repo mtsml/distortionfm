@@ -15,20 +15,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 const getMethod = async (req: NextApiRequest, res: NextApiResponse) => {
   const speakerId = req.query.speakerId as string;
 
-  if (speakerId) {
-    const { rows } = await sql`
-      SELECT id, name, encode(icon, 'base64') as icon, description
-      FROM speaker
-      WHERE id = ${speakerId}
-    `;
+  const { rows } = await sql`
+    SELECT id, name, encode(icon, 'base64') as icon, description
+    FROM speaker
+    WHERE id = ${speakerId}
+  `;
 
-    if (rows.length !== 0) {
-      res.status(200).json({ speaker: rows[0] });
-    }
+  if (rows.length === 0) {
+    // Not Found
+    res.status(404).json({ speaker: {} });
+    return;
   }
-
-  // Not Found
-  res.status(404).end();
+  res.status(200).json({ speaker: rows[0] });
 }
 
 const optionsMethod = async (res: NextApiResponse) => {
