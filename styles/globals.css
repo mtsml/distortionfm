@@ -101,8 +101,17 @@ p {
   transition: all 0.2s 0.2s ease-out;
 }
 
-#descriptionWrapper {
+#descriptionWrapper,
+#chapterWrapper {
   border-top: 2px solid #eee;
+}
+
+#chapterWrapper {
+  padding-top: 1em;
+}
+
+#chapterWrapper li {
+  cursor: pointer;
 }
 
 .tab {

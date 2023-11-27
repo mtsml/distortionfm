@@ -8,12 +8,14 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SpeakerIcon from "@/components/SpeakerIcon";
 import Episode from "@/types/episode";
+import Chapter from "@/types/chapter";
 import Transcript from "@/types/transcript";
-import { getIdFromAnchorRssFeedItem, toSimpleDateFormat } from "@/util/utility";
+import { getIdFromAnchorRssFeedItem, toMmssFormat, toSimpleDateFormat } from "@/util/utility";
 
 interface EpisodeWithDetail extends Episode {
   enclosure: Parser.Enclosure;
   description: string;
+  chapters: Chapter[];
   transcripts: Transcript[];
 }
 
@@ -120,10 +122,18 @@ const EpisodePage = ({ episode }: EpisodePageProps) => {
               >
                 説明
               </a>
-              {episode.transcripts.length !== 0 && (
+              {episode.chapters.length !== 0 && (
                 <a
                   className={clsx("tab", { active: activeTabIdx === 1})}
                   onClick={() => setActiveTabIdx(1)}
+                >
+                  チャプター
+                </a>
+              )}
+              {episode.transcripts.length !== 0 && (
+                <a
+                  className={clsx("tab", { active: activeTabIdx === 2})}
+                  onClick={() => setActiveTabIdx(2)}
                 >
                   文字起こし
                 </a>
@@ -153,9 +163,32 @@ const EpisodePage = ({ episode }: EpisodePageProps) => {
               </p>
             </div>
             <div
+              id="chapterWrapper"
+              style={{ display: activeTabIdx === 1 ? "block" : "none" }}
+            >
+              <ul
+                className="pure-menu"
+              >
+                {episode.chapters.map(chapter => (
+                  <li
+                    id={String(chapter.startMs)}
+                    key={chapter.startMs}
+                    className="pure-menu-item"
+                    >
+                    <span
+                      className="pure-menu-link"
+                      onClick={() => playFrom(chapter.startMs)}
+                    >
+                      {toMmssFormat(chapter.startMs)} {chapter.title}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div
               id="transcriptWrapper"
               className="transcript"
-              style={{ display: activeTabIdx === 1 ? "block" : "none" }}
+              style={{ display: activeTabIdx === 2 ? "block" : "none" }}
             >
               {episode.transcripts.map(transcript => (
                 <p
@@ -215,6 +248,19 @@ export const getStaticProps: GetStaticProps = async (context) => {
     ORDER BY start_ms
   `).rows;
 
+  // chapters info from DB
+  const chapters = (await sql`
+    SELECT
+      start_ms AS "startMs",
+      title
+    FROM
+      chapters
+    WHERE
+      episode_id = ${id}
+    ORDER BY
+      start_ms
+  `).rows;
+
   // episode info from DB
   const guests = (await sql`
     SELECT speaker.id, name, encode(icon, 'base64') as icon
@@ -232,6 +278,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         guests,
         enclosure,
         description: content,
+        chapters: chapters || [],
         transcripts: transcripts || []
       }
     }
