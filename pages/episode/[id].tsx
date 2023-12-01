@@ -166,18 +166,18 @@ const EpisodePage = ({ episode }: EpisodePageProps) => {
               id="chapterWrapper"
               style={{ display: activeTabIdx === 1 ? "block" : "none" }}
             >
-              <ul
-                className="pure-menu"
-              >
+              <ul className="pure-menu">
                 {episode.chapters.map(chapter => (
                   <li
-                    id={String(chapter.startMs)}
                     key={chapter.startMs}
                     className="pure-menu-item"
-                    >
+                  >
                     <span
                       className="pure-menu-link"
-                      onClick={() => playFrom(chapter.startMs)}
+                      onClick={() => {
+                        setActiveTabIdx(2);
+                        playFrom(chapter.startMs);
+                      }}
                     >
                       {toMmssFormat(chapter.startMs)} {chapter.title}
                     </span>
