@@ -17,6 +17,13 @@ export const toSimpleDateFormat = (dateString: string | undefined): string | und
   return dateString && (new Date(dateString)).toLocaleDateString('ja-JP');
 }
 
+export const toMmssFormat = (ms: number): string => {
+  const s = ms / 1000;
+  const mm = Math.floor(s / 60);
+  const ss = Math.floor(s % 60);
+  return `${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+}
+
 const MESSAGE_NOT_SUPPORT_WEB_PUSH = "このブラウザでは通知機能が利用できません。";
 const MESSAGE_DENIED_NOTIFICATIONS = [
   "通知設定が拒否されています。",
