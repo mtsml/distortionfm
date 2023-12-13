@@ -100,6 +100,10 @@ const EpisodePage = ({ episode }: EpisodePageProps) => {
     <>
       <Head>
         <title>{episode.title}</title>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="og:type" content="article" />
+        <meta name="og:title" content={episode.title} />
+        <meta name="og:url" content={`https://distortion.fm/episode/${episode.id}`} />
       </Head>
       <div className="pure-g">
         <Header />

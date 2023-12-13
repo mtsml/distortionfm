@@ -19,6 +19,10 @@ const SpeakerPage = ({ episodes, speaker }: SpeakerPageProps) => {
     <>
       <Head>
         <title>{speaker.name}</title>
+        <meta name="og:type" content="article" />
+        <meta name="og:title" content={speaker.name} />
+        <meta name="og:url" content={`https://distortion.fm/speaker/${speaker.id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
       </Head>
       <div className="pure-g">
         <Header />
