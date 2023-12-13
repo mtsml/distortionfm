@@ -7,6 +7,8 @@ const Document = () => {
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content="1995年生まれの男性が友達と雑談をする" />
+        <meta name="og:image" content="https://distortion.fm/icon-512x512.png" />
+        <meta name="og:site_name" content="Distortion.fm" />
         <title>Distortion.fm</title>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
