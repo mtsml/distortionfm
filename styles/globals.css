@@ -45,6 +45,12 @@ h2 {
   white-space: normal;
 }
 
+@media (hover: none) {
+  .pure-menu-link:hover {
+    background-color: inherit;
+  }
+}
+
 ul {
   list-style-type: none;
   margin-block-start: 0em;
