@@ -285,7 +285,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
         chapters: chapters || [],
         transcripts: transcripts || []
       }
-    }
+    },
+    revalidate: 60 // seconds
   }
 }
 
