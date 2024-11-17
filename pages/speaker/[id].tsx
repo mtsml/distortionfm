@@ -106,7 +106,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     props: {
       episodes,
       speaker
-    }
+    },
+    revalidate: 60 // seconds
   }
 }
 
