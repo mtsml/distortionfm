@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { sql } from "@vercel/postgres";
+import { d1Run } from "@/util/db";
 
 const webPush = require("web-push");
 
@@ -39,10 +39,13 @@ const postMethod = async (req: NextApiRequest, res: NextApiResponse) => {
   );
 
   // INSERT
-  await sql`
-    INSERT INTO subscription(endpoint, keys_p256dh, keys_auth)
-    VALUES(${subscription.endpoint}, ${subscription.keys.p256dh}, ${subscription.keys.auth})
-  `;
+  await d1Run(
+    `
+      INSERT INTO subscription(endpoint, keys_p256dh, keys_auth)
+      VALUES(?, ?, ?)
+    `,
+    [subscription.endpoint, subscription.keys.p256dh, subscription.keys.auth]
+  );
 
   res.status(201).end();
 }
@@ -57,17 +60,23 @@ const putMethod = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (oldEndpoint) {
     // DELETE
-    await sql`
-      DELETE FROM subscription
-      WHERE endpoint = ${oldEndpoint}
-    `;
+    await d1Run(
+      `
+        DELETE FROM subscription
+        WHERE endpoint = ?
+      `,
+      [oldEndpoint]
+    );
   }
 
   // INSERT
-  await sql`
-    INSERT INTO subscription(endpoint, keys_p256dh, keys_auth)
-    VALUES(${subscription.endpoint}, ${subscription.keys.p256dh}, ${subscription.keys.auth})
-  `;
+  await d1Run(
+    `
+      INSERT INTO subscription(endpoint, keys_p256dh, keys_auth)
+      VALUES(?, ?, ?)
+    `,
+    [subscription.endpoint, subscription.keys.p256dh, subscription.keys.auth]
+  );
 
   res.status(200).end();
 }
@@ -76,10 +85,13 @@ const deleteMethod = async (req: NextApiRequest, res: NextApiResponse) => {
   const endpoint = req.body.subscription.endpoint;
 
   // DELETE
-  await sql`
-    DELETE FROM subscription
-    WHERE endpoint = ${endpoint}
-  `;
+  await d1Run(
+    `
+      DELETE FROM subscription
+      WHERE endpoint = ?
+    `,
+    [endpoint]
+  );
 
   res.status(200).end();
 }

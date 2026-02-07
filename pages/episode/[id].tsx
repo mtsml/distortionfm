@@ -3,7 +3,6 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Parser from "rss-parser";
 import clsx from "clsx";
-import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SpeakerIcon from "@/components/SpeakerIcon";
@@ -11,6 +10,7 @@ import Episode from "@/types/episode";
 import Chapter from "@/types/chapter";
 import Transcript from "@/types/transcript";
 import { getIdFromAnchorRssFeedItem, toMmssFormat, toSimpleDateFormat } from "@/util/utility";
+import { d1All } from "@/util/db";
 
 interface EpisodeWithDetail extends Episode {
   enclosure: Parser.Enclosure;
@@ -214,18 +214,8 @@ const EpisodePage = ({ episode }: EpisodePageProps) => {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const parser = new Parser();
-  const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
-
-  const paths = feed.items.map(item => {
-    const id = getIdFromAnchorRssFeedItem(item);
-    return {
-      params: { id }
-    }
-  });
-
   return {
-    paths,
+    paths: [],
     fallback: 'blocking'
   }
 }
@@ -245,33 +235,45 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const { title , isoDate, content, enclosure } = episode;
 
   // transcript info from DB
-  const transcripts = (await sql`
-    SELECT transcript, start_ms AS "startMs", end_ms AS "endMs"
-    FROM vtt
-    WHERE id = ${id}
-    ORDER BY start_ms
-  `).rows;
+  const transcripts = await d1All<Transcript>(
+    `
+      SELECT
+        transcript,
+        start_ms AS startMs,
+        end_ms AS endMs
+      FROM vtt
+      WHERE id = ?
+      ORDER BY start_ms
+    `,
+    [id]
+  );
 
   // chapters info from DB
-  const chapters = (await sql`
-    SELECT
-      start_ms AS "startMs",
-      title
-    FROM
-      chapters
-    WHERE
-      episode_id = ${id}
-    ORDER BY
-      start_ms
-  `).rows;
+  const chapters = await d1All<Chapter>(
+    `
+      SELECT
+        start_ms AS startMs,
+        title
+      FROM chapters
+      WHERE episode_id = ?
+      ORDER BY start_ms
+    `,
+    [id]
+  );
 
   // episode info from DB
-  const guests = (await sql`
-    SELECT speaker.id, name, encode(icon, 'base64') as icon
-    FROM episode_speaker_map esm
-    INNER JOIN speaker ON speaker.id = esm.speaker_id
-    WHERE episode_id = ${id} AND speaker_id <> 0
-  `).rows;
+  const guests = await d1All<{ id: number; name: string; icon: string }>(
+    `
+      SELECT
+        speaker.id,
+        speaker.name,
+        CAST(speaker.icon AS TEXT) AS icon
+      FROM episode_speaker_map esm
+      INNER JOIN speaker ON speaker.id = esm.speaker_id
+      WHERE esm.episode_id = ? AND esm.speaker_id <> 0
+    `,
+    [id]
+  );
 
   return {
     props: {
