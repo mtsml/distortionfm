@@ -18,7 +18,7 @@ interface D1Database {
 }
 
 interface CloudflareEnv {
-  DB: D1Database;
+  DB?: D1Database;
 }
 
 const sleep = async (ms: number): Promise<void> =>
@@ -52,9 +52,22 @@ const withD1Retry = async <T>(operation: () => Promise<T>): Promise<T> => {
   throw new Error("Unreachable retry state");
 };
 
-const getDbOrThrowError = async (): Promise<D1Database> => {
+const getCloudflareEnv = async (): Promise<CloudflareEnv> => {
   const { env } = await getCloudflareContext({ async: true });
-  const cfEnv = env as CloudflareEnv;
+  return env as CloudflareEnv;
+};
+
+export const hasD1Binding = async (): Promise<boolean> => {
+  try {
+    const env = await getCloudflareEnv();
+    return !!env.DB;
+  } catch {
+    return false;
+  }
+};
+
+const getDbOrThrowError = async (): Promise<D1Database> => {
+  const cfEnv = await getCloudflareEnv();
   if (!cfEnv.DB) {
     throw new Error("Cloudflare D1 binding 'DB' is not configured.");
   }

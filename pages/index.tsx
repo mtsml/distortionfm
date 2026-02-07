@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import EpisodeList from "@/components/EpisodeList";
 import Episode from "@/types/episode";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
-import { d1All } from "@/util/db";
+import { d1All, hasD1Binding } from "@/util/db";
 
 interface HomeProps {
   episodes: Episode[];
@@ -32,19 +32,22 @@ export const getStaticProps: GetStaticProps = async () => {
   const parser = new Parser();
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
-  const rows = await d1All<{ episode_id: string; id: number; name: string; icon: string }>(
-    `
-      SELECT
-        esm.episode_id,
-        speaker.id,
-        speaker.name,
-        CAST(speaker.icon AS TEXT) AS icon
-      FROM episode_speaker_map esm
-      INNER JOIN speaker ON speaker.id = esm.speaker_id
-      WHERE esm.speaker_id <> 0
-      ORDER BY esm.episode_id, esm.speaker_id
-    `
-  );
+  let rows: { episode_id: string; id: number; name: string; icon: string }[] = [];
+  if (await hasD1Binding()) {
+    rows = await d1All<{ episode_id: string; id: number; name: string; icon: string }>(
+      `
+        SELECT
+          esm.episode_id,
+          speaker.id,
+          speaker.name,
+          CAST(speaker.icon AS TEXT) AS icon
+        FROM episode_speaker_map esm
+        INNER JOIN speaker ON speaker.id = esm.speaker_id
+        WHERE esm.speaker_id <> 0
+        ORDER BY esm.episode_id, esm.speaker_id
+      `
+    );
+  }
 
   const episodes = feed.items.map(item => {
     const id = getIdFromAnchorRssFeedItem(item);
