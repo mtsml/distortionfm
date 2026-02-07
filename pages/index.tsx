@@ -1,4 +1,4 @@
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import Parser from "rss-parser";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -28,7 +28,9 @@ const Home = ({ episodes }: HomeProps) => {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+  res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+
   const parser = new Parser();
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
@@ -63,8 +65,7 @@ export const getStaticProps: GetStaticProps = async () => {
   return {
     props: {
       episodes
-    },
-    revalidate: 60 // seconds
+    }
   }
 }
 
