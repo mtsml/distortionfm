@@ -7,11 +7,17 @@ npm install
 npm run dev
 ```
 
+### Cloudflare Deploy
+```sh
+npm run cf:build
+npm run cf:deploy
+```
+
 ### DB
 #### vtt
 |column|type|constraint|
 |--|--|--|
-|id|seq|PK|
-|start_ms|int|PK|
-|end_ms|int|NOT NULL|
-|transcript|varchar|NOT NULL|
+|id|text|PK(複合)|
+|start_ms|integer|PK(複合)|
+|end_ms|integer|NOT NULL|
+|transcript|text|NOT NULL|
