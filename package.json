@@ -7,9 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "cf:build": "opennextjs-cloudflare build",
-    "cf:preview": "opennextjs-cloudflare preview",
-    "cf:deploy": "opennextjs-cloudflare deploy"
+    "cf:prepare": "node scripts/generate-wrangler-config.mjs",
+    "cf:build": "npm run cf:prepare && opennextjs-cloudflare build --config .wrangler.deploy.toml",
+    "cf:preview": "npm run cf:prepare && opennextjs-cloudflare preview --config .wrangler.deploy.toml",
+    "cf:deploy": "npm run cf:prepare && opennextjs-cloudflare deploy --config .wrangler.deploy.toml"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
