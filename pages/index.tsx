@@ -1,11 +1,11 @@
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import Parser from "rss-parser";
-import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EpisodeList from "@/components/EpisodeList";
 import Episode from "@/types/episode";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
+import { d1All } from "@/util/db";
 
 interface HomeProps {
   episodes: Episode[];
@@ -28,16 +28,25 @@ const Home = ({ episodes }: HomeProps) => {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+  res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+
   const parser = new Parser();
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
-  const { rows } = await sql`
-    SELECT episode_id, speaker_id as id, name, encode(icon, 'base64') as icon
-    FROM episode_speaker_map esm
-    INNER JOIN speaker ON speaker.id = esm.speaker_id AND esm.speaker_id <> 0
-    ORDER BY episode_id, speaker_id
-  `;
+  const rows = await d1All<{ episode_id: string; id: number; name: string; icon: string }>(
+    `
+      SELECT
+        esm.episode_id,
+        speaker.id,
+        speaker.name,
+        CAST(speaker.icon AS TEXT) AS icon
+      FROM episode_speaker_map esm
+      INNER JOIN speaker ON speaker.id = esm.speaker_id
+      WHERE esm.speaker_id <> 0
+      ORDER BY esm.episode_id, esm.speaker_id
+    `
+  );
 
   const episodes = feed.items.map(item => {
     const id = getIdFromAnchorRssFeedItem(item);
@@ -56,8 +65,7 @@ export const getStaticProps: GetStaticProps = async () => {
   return {
     props: {
       episodes
-    },
-    revalidate: 60 // seconds
+    }
   }
 }
 

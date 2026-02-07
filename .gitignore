@@ -11,6 +11,7 @@
 # next.js
 /.next/
 /out/
+/.open-next/
 
 # production
 /build
@@ -29,6 +30,8 @@ yarn-error.log*
 
 # vercel
 .vercel
+.wrangler
+.wrangler.deploy.toml
 
 # typescript
 *.tsbuildinfo

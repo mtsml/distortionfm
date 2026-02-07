@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cf:prepare": "node scripts/generate-wrangler-config.mjs",
+    "cf:build": "npm run cf:prepare && opennextjs-cloudflare build --config .wrangler.deploy.toml",
+    "cf:preview": "npm run cf:prepare && opennextjs-cloudflare preview --config .wrangler.deploy.toml",
+    "cf:deploy": "npm run cf:prepare && opennextjs-cloudflare deploy --config .wrangler.deploy.toml"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
@@ -15,15 +19,18 @@
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@types/node": "20.6.3",
-    "@types/react": "18.2.22",
-    "@types/react-dom": "18.2.7",
-    "@vercel/postgres": "^0.5.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "clsx": "^2.0.0",
-    "next": "13.5.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "next": "15.5.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "rss-parser": "^3.13.0",
     "typescript": "5.2.2",
     "web-push": "^3.6.6"
+  },
+  "devDependencies": {
+    "@opennextjs/cloudflare": "1.16.3",
+    "wrangler": "^4.51.1"
   }
 }

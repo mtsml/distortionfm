@@ -1,13 +1,13 @@
 import { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Parser from "rss-parser";
-import { sql } from "@vercel/postgres";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EpisodeList from "@/components/EpisodeList";
 import Episode from "@/types/episode";
 import Speaker from "@/types/speaker";
 import { getIdFromAnchorRssFeedItem } from "@/util/utility";
+import { d1All } from "@/util/db";
 
 interface SpeakerPageProps {
   episodes: Episode[];
@@ -51,21 +51,8 @@ const SpeakerPage = ({ episodes, speaker }: SpeakerPageProps) => {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { rows } = await sql`
-    SELECT id
-    FROM speaker
-  `;
-
-  const paths = rows.map(speaker => {
-    return {
-      params: {
-        id: String(speaker.id)
-      }
-    }
-  });
-
   return {
-    paths,
+    paths: [],
     fallback: 'blocking'
   }
 }
@@ -76,11 +63,16 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const parser = new Parser();
   const feed = await parser.parseURL('https://anchor.fm/s/db286500/podcast/rss');
 
-  const episodeIds = (await sql`
-    SELECT episode_id
-    FROM episode_speaker_map
-    WHERE speaker_id = ${speakerId}
-  `).rows.map(row => row.episode_id);
+  const episodeIds = (
+    await d1All<{ episode_id: string }>(
+      `
+        SELECT episode_id
+        FROM episode_speaker_map
+        WHERE speaker_id = ?
+      `,
+      [speakerId]
+    )
+  ).map(row => row.episode_id);
 
   const episodes = feed.items
     .map(item => {
@@ -96,11 +88,16 @@ export const getStaticProps: GetStaticProps = async (context) => {
     })
     .filter(episode => episodeIds.includes(episode.id));
 
-  const speaker = (await sql`
-    SELECT id, name, encode(icon, 'base64') as icon, description
-    FROM speaker
-    WHERE id = ${speakerId}
-  `).rows[0];
+  const speaker = (
+    await d1All<Speaker>(
+      `
+        SELECT id, name, CAST(icon AS TEXT) AS icon, description
+        FROM speaker
+        WHERE id = ?
+      `,
+      [speakerId]
+    )
+  )[0];
 
   return {
     props: {
