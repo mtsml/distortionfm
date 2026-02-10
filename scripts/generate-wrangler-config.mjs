@@ -18,6 +18,9 @@ main = ".open-next/worker.js"
 compatibility_date = "${compatibilityDate}"
 compatibility_flags = ["nodejs_compat"]
 
+[observability.logs]
+enabled = true
+
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
